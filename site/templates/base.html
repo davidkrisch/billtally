@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>BillTally - {% block title %}{% endblock %}</title>
+	</head>
+	<body>
+		<div id="content">
+			<div>
+				<span class="sitename">BillTally</span>
+				<span class="login">
+					{% if user.is_authenticated %}
+					Hi, {{ user.username}}. <a href="{% url django.contrib.auth.views.logout %}">Logout</a>	
+					{% else %}
+					<a href="{% url django.contrib.auth.views.login %}">Login</a>
+					<a href="{% url registration_register %}">Register</a>
+					{% endif %}
+				</span>
+			</div>
+			{% block content %}{% endblock %}
+		</div>
+	</body>
+</html>

@@ -1,0 +1,11 @@
+Welcome to BillTally. 
+
+Please click this link to get started:
+http://{{ site.domain }}{% url registration_activate activation_key %}
+
+This link will be active for {{ expiration_days }} days.
+
+Thank you for signing up!
+
+-David
+The BillTally Team

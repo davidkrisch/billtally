@@ -1,0 +1,67 @@
+[
+  {"pk": 1, "model": "auth.user", 
+    "fields": {"username": "davidkrisch", "first_name": "David", "last_name": "Krisch", 
+      "email": "david.krisch@yahoo.com", "password": "", "is_staff": false, 
+      "is_active": true, "is_superuser": false, "last_login": "2010-01-31", 
+      "date_joined": "2009-08-30"}}, 
+  {"pk": 2, "model": "auth.user", 
+    "fields": {"username": "johnsmith", "first_name": "John", "last_name": "Smith", 
+      "email": "johnsmith@example.com", "password": "", "is_staff": false, 
+      "is_active": true, "is_superuser": false, "last_login": "2010-04-30", 
+      "date_joined": "2010-01-01"}}, 
+  {
+    "pk": 3, 
+    "model": "site.bill", 
+    "fields": {
+			"user": 1,
+      "date": "2010-02-03", 
+      "amount": "45.25", 
+      "name": "SDGE", 
+      "is_paid": false 
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "site.bill", 
+    "fields": {
+			"user": 1,
+      "date": "2030-02-05", 
+      "amount": "1725.34", 
+      "name": "Mortgage", 
+      "is_paid": false 
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "site.bill", 
+    "fields": {
+			"user": 1,
+      "date": "2010-02-06", 
+      "amount": "140.67", 
+      "name": "Verizon", 
+      "is_paid": true 
+    }
+  },
+  {
+    "pk": 4, 
+    "model": "site.bill", 
+    "fields": {
+			"user": 1,
+      "date": "2030-12-06", 
+      "amount": "140.67", 
+      "name": "Verizon", 
+      "is_paid": true 
+    }
+  },
+  {
+    "pk": 5, 
+    "model": "site.bill", 
+    "fields": {
+			"user": 2,
+      "date": "2030-02-16", 
+      "amount": "40.64", 
+      "name": "Sprint Cell Phone", 
+      "is_paid": true 
+    }
+  }
+]
