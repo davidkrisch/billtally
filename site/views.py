@@ -3,7 +3,18 @@ from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from models import Bill, Recurrence, BillForm
+from models import Bill, Recurrence
+from forms import BillForm, RecurrenceForm
+
+def api_create_bill(request):
+	"""Create a Bill and the corresponding Recurrance if necessary
+
+	Throws a FormErrorException if there is a validation error
+
+	Parameters:
+		request - HttpRequest
+	"""
+	pass
 
 @login_required
 def list_bills(request):
@@ -23,13 +34,31 @@ def create_bill(request):
 	if request.method not in ('POST', 'GET'):
 		return HttpResponseNotAllowed(['GET', 'POST'])
 
+	bill_obj = None
+
 	if request.method == 'GET':
 		return render_to_response('bills_form.html', 
-				{'form': BillForm()}, context_instance=RequestContext(request))
+				{'bill_form': BillForm(), 'recurrence_form': RecurrenceForm()},
+				 context_instance=RequestContext(request))
 	else:
-		bill_instance = Bill(user=request.user)
-		bill = BillForm(request.POST, instance=bill_instance)
-		bill.save()
+		bill_form = BillForm(request.POST)
+		if bill_form.is_valid():
+			bill_obj = bill_form.save(commit=False)
+			bill_obj.user = request.user
+			bill_obj.save()
+		else:
+			# TODO return form errors
+			print bill_form.errors
+
+		recurrence_form = RecurrenceForm(request.POST)
+		if recurrence_form.is_valid():
+			recurrence_obj = recurrence_form.save(commit=False)	
+			recurrence_obj.bill = bill_obj
+			recurrence_obj.save()
+		else:
+			# TODO return form errors
+			print recurrence_form.errors
+
 		return redirect('/list/')
 
 #	if request.method == 'GET'

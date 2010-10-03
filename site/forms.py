@@ -1,9 +1,20 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-
+from models import Bill, Recurrence
 from registration.models import RegistrationProfile
 
+class BillForm(forms.ModelForm):
+	"""Form for Bill objects"""
+	class Meta:
+		model = Bill
+		exclude = ('user',)
+
+class RecurrenceForm(forms.ModelForm):
+	"""Form for Recurrence objects"""
+	class Meta:
+		model = Recurrence
+		exclude = ('bill',)
 
 class RegistrationFormEmailIsUserName(forms.Form):
 	"""
