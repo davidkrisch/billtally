@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from billtally.site.models import Bill, Recurrence
 from django.contrib.auth.models import User
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 class BillModelTest(TestCase):
 	'''Test the Bill model'''
@@ -38,6 +40,26 @@ class BillModelTest(TestCase):
 		r_list = recurrence.as_list()
 		self.assertEquals(len(r_list), 1)  
 
+		# The next due date should be the first day of next month
+		expected = datetime.today() + relativedelta(day=1, months=+1)
+		self.assertEquals(r_list[0].date(), expected.date())
+
+	def test_as_list_with_startdate(self):
+		'''Test as_list with a start date'''
+		bill = Bill(**self.bill_data)
+		bill.save()
+		recurrence = Recurrence(**self.recurrence_data)
+		recurrence.bill = bill
+		recurrence.save()
+		start = datetime(2030, 12, 15)
+		r_list = recurrence.as_list(start_date=start)
+		expected = start + relativedelta(day=1, months=+1)
+		self.assertEquals(r_list[0].date(), expected.date())
+
+	def test_as_list_with_enddate(self):
+		'''Test as_list with a end date'''
+		pass
+
 class BillViewTest(TestCase):
 	fixtures = ['bills.json']
 
@@ -64,7 +86,7 @@ class BillViewTest(TestCase):
 		self.assertTrue(response.context[0].has_key('bill_form'))
 		self.assertTrue(response.context[0].has_key('recurrence_form'))
 
-	def test_create_bill(self):
+	def test_create_simple_bill(self):
 		"""Test that create bill adds a single new bill"""
 		num_bills_before = Bill.objects.count()
 		response = self.client.post('/create/', 
