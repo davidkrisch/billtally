@@ -56,9 +56,18 @@ class BillModelTest(TestCase):
 		expected = start + relativedelta(day=1, months=+1)
 		self.assertEquals(r_list[0].date(), expected.date())
 
-	def test_as_list_with_enddate(self):
+	def test_as_list_with_startdate_and_enddate(self):
 		'''Test as_list with a end date'''
-		pass
+		bill = Bill(**self.bill_data)
+		bill.save()
+		recurrence = Recurrence(**self.recurrence_data)
+		recurrence.bill = bill
+		recurrence.save()
+		start = datetime(2010, 11, 15)
+		end = datetime(2010, 12, 15)
+		r_list = recurrence.as_list(start_date=start, end_date=end)
+		self.assertEquals(len(r_list), 1)
+		self.assertEquals(r_list[0].date(), datetime(2010, 12, 1).date())
 
 class BillViewTest(TestCase):
 	fixtures = ['bills.json']
