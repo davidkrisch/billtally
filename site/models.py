@@ -6,7 +6,7 @@ from dateutil.rrule import *
 from dateutil.relativedelta import *
 from django.forms.models import model_to_dict
 
-FREQUENCY_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
+RECURRENCE_FREQ_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
 
 class Bill(models.Model):
 	user = models.ForeignKey(User)

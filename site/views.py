@@ -3,7 +3,7 @@ from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from models import Bill, Recurrence
+from models import Bill, Recurrence, RECURRENCE_FREQ_MAP
 from forms import BillForm, RecurrenceForm
 
 def api_create_bill(request):
@@ -45,19 +45,41 @@ def create_bill(request):
 		if bill_form.is_valid():
 			bill_obj = bill_form.save(commit=False)
 			bill_obj.user = request.user
-			bill_obj.save()
 		else:
 			# TODO return form errors
 			print bill_form.errors
 
-		recurrence_form = RecurrenceForm(request.POST)
-		if recurrence_form.is_valid():
-			recurrence_obj = recurrence_form.save(commit=False)	
-			recurrence_obj.bill = bill_obj
-			recurrence_obj.save()
+		if 'does_repeat' in bill_form.data:
+			recurrence_form = RecurrenceForm(request.POST)
+			if recurrence_form.is_valid():
+				bill_obj.save()
+				repeats = recurrence_form.cleaned_data['repeats']
+				if repeats == 'monthly':
+					repeat_by = recurrence_form.cleaned_data['repeat_by'] 
+					repeat_every = recurrence_form.cleaned_data['repeat_every']
+					has_end = recurrence_form.cleaned_data['has_end']
+					end_date = recurrence_form.cleaned_data['end_date']
+
+					recurrence_obj = Recurrence(bill=bill_obj)
+					recurrence_obj.frequency = RECURRENCE_FREQ_MAP['monthly']
+					recurrence_obj.dtstart = bill_obj.date
+
+					if repeat_by == 'day_of_month':
+						recurrence_obj.bymonthday = repeat_every
+					else:
+						pass
+						# TODO 'Monthly on the third Friday'
+
+					if has_end:
+						recurrence_obj.until = end_date
+
+					recurrence_obj.save()
+			else:
+				# TODO return form errors
+				print recurrence_form.errors
 		else:
-			# TODO return form errors
-			print recurrence_form.errors
+			# The bill does not repeat
+			bill_obj.save()
 
 		return redirect('/list/')
 

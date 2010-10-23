@@ -3,29 +3,5 @@
 {% block title %}Your Bills{% endblock %}
 
 {% block content %}
-{% if overdue %}
-<h2>Overdue</h2>
-	<ol>
-	{% for bill in overdue %}
-		<li>{{ bill.name }}</li>
-	{% endfor %}
-	</ol>
-{% endif %}
-{% if unpaid %}
-<h2>Unpaid</h2>
-	<ol>
-	{% for bill in unpaid %}
-		<li>{{ bill.name }}</li>
-	{% endfor %}
-	</ol>
-{% endif %}
-{% if paid %}
-<h2>Paid</h2>
-	<ol>
-	{% for bill in paid %}
-		<li>{{ bill.name }}</li>
-	{% endfor %}
-	</ol>
-{% endif %}
 <a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
 {% endblock %}

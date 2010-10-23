@@ -6,15 +6,33 @@ from registration.models import RegistrationProfile
 
 class BillForm(forms.ModelForm):
 	"""Form for Bill objects"""
+	does_repeat = forms.BooleanField(label='Repeat...', required=False)
 	class Meta:
 		model = Bill
-		exclude = ('user',)
+		exclude = ('user', 'parent')
 
-class RecurrenceForm(forms.ModelForm):
+class RecurrenceForm(forms.Form):
 	"""Form for Recurrence objects"""
-	class Meta:
-		model = Recurrence
-		exclude = ('bill',)
+	repeat_choices = (('daily', 'Daily'), ('weekly', 'Weekly'), 
+										('monthly', 'Monthly'), ('yearly', 'Yearly'))
+	repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6),
+													('7', 7),('8', 8), ('9', 9), ('10', 10), ('11', 11), ('12', 12),
+													('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18))
+	weekday_choices = (('Sunday', 'S'), ('Monday', 'M'), ('Tuesday', 'T'), ('Wednesday', 'W'), 
+											('Thursday', 'T'), ('Friday', 'F'), ('Saturday', 'S'))
+	repeat_by_choices = (('day_of_month', 'day of the Month'), ('day_of_week', 'day of the week'))
+	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
+	
+	repeats = forms.ChoiceField(choices=repeat_choices)
+	repeat_every = forms.ChoiceField(choices=repeat_every_choices)
+	# Only used for weekly
+	repeat_on = forms.MultipleChoiceField(choices=weekday_choices, required=False)
+	# Only used for monthly
+	repeat_by = forms.ChoiceField(widget=forms.RadioSelect(),
+																choices=repeat_by_choices, required=False)
+	has_end =  forms.ChoiceField(widget=forms.RadioSelect(),
+																choices=ends_on_choices)
+	end_date = forms.DateField(required=False)
 
 class RegistrationFormEmailIsUserName(forms.Form):
 	"""

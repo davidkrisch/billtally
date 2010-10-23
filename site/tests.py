@@ -100,17 +100,21 @@ class BillViewTest(TestCase):
 		num_bills_before = Bill.objects.count()
 		response = self.client.post('/create/', 
 				{'name': 'Grocery Shopping', 'amount': '64.57', 'date': '07/10/2010',
-					'is_paid': False, 'is_recurring': False}, follow=True)
+					'is_paid': False}, follow=True)
 		self.assertRedirects(response, '/list/')
 		num_bills_after = Bill.objects.count()
 		self.assertEqual(num_bills_before + 1, num_bills_after)
 
-#class RecurringBillTest(TestCase):
-#	fixtures = ['bills.json']
-#
-#	def test_create_recurring_bill(self):
-#		"""Test that creating a recurring bill adds a single new bill"""
-#		num_bills_before = RecurringBill.objects.count()
-#		response = self.client.post('/create/',
-#				{'name': 'Gym Membership', 'amount': '39.90', 'date': '07/20/2010',
-#					'is_paid': False, 'is_recurring': True, }, follow=True) 
+	def test_create_recurring_bill_monthly(self):
+		"""Test that creating a recurring bill adds a single new bill"""
+		num_recur_before = Recurrence.objects.count()
+		num_bill_before = Bill.objects.count()
+		response = self.client.post('/create/',
+				{'name': 'Gym Membership', 'amount': '39.90', 'date': '07/20/2010',
+					'is_paid': False, 'does_repeat': 'true', 'repeats': 'monthly', 
+					'repeat_every': 15, 'repeat_by': 'day_of_month', 'repeat_every': 1, 
+					'has_end': 'until', 'end_date': '2011-10-15'}, follow=True) 
+		num_recur_after = Recurrence.objects.count()
+		num_bill_after = Bill.objects.count()
+		self.assertEqual(num_bill_before + 1, num_bill_after)
+		self.assertEqual(num_recur_before + 1, num_recur_after)
