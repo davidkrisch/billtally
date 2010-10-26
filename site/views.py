@@ -61,7 +61,7 @@ def create_bill(request):
 					end_date = recurrence_form.cleaned_data['end_date']
 
 					recurrence_obj = Recurrence(bill=bill_obj)
-					recurrence_obj.frequency = RECURRENCE_FREQ_MAP['monthly']
+					recurrence_obj.frequency = 'monthly'
 					recurrence_obj.dtstart = bill_obj.date
 
 					if repeat_by == 'day_of_month':

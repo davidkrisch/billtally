@@ -2,6 +2,7 @@ from django.db import models
 from django.forms import ModelForm, BooleanField
 from django.contrib.auth.models import User
 from datetime import datetime
+from datetime import time
 from dateutil.rrule import *
 from dateutil.relativedelta import *
 from django.forms.models import model_to_dict
@@ -33,10 +34,10 @@ class RecurrenceManager(models.Manager):
 
 class Recurrence(models.Model):
 	FREQUENCY_CHOICES = (
-	            ('DAILY', DAILY),
-	            ('WEEKLY', WEEKLY),
-	            ('MONTHLY', MONTHLY),
-	            ('YEARLY', YEARLY),
+	            ('DAILY', 'daily'),
+	            ('WEEKLY', 'weekly'),
+	            ('MONTHLY', 'monthly'),
+	            ('YEARLY', 'yearly'),
 	        )
 	frequency = models.CharField(max_length=7, choices=FREQUENCY_CHOICES)
 	dtstart = models.DateField()
@@ -58,10 +59,12 @@ class Recurrence(models.Model):
 			With no arguments, returns the next 30 days by default
 
 			Arguments (datetime objects)
-				start_date - (optional) If specified, the rrule will start at this datetime
+				start_date - (optional) datetime object - if specified, the rrule will start at this datetime
 					If not specified, the start date will be today
-				end_date - (optional) If specified, the rrule will end at start_date plus 1 month
+				end_date - (optional) datetime object - if specified, the rrule will end at start_date plus 1 month
 					If not specified, the end date will be 30 days from the start date
+			Returns
+				list of the dates that this recurrence represents
 		'''
 		if not self.frequency or not self.dtstart:
 			raise Exception('frequency or dtstart not defined')
@@ -70,30 +73,29 @@ class Recurrence(models.Model):
 			start_date = datetime.today()
 		if not end_date:
 			end_date = start_date + relativedelta(months=+1)
+			end_date = datetime.combine(end_date, time())
 
 		# Convert this model to a dictionary
 		model_dict = model_to_dict(self, exclude=['id', 'bill'])
 
-		# Remove frequency because it isa positional argument
+		# Remove frequency because it is a positional argument
 		del model_dict['frequency']
 
-		# Convert until to a datetime object or remove it if it isn't defined
-		if model_dict['until']:
-			model_dict['until'] = datetime.strptime(model_dict['until'], '%Y-%m-%d')
-		else:
-			del model_dict['until']
-
-		# Delete unused keys
+		# Find keys that are blank so we can remove them 
 		to_remove = []
 		for key, value in model_dict.iteritems():
 			if not value:
 				to_remove.append(key)
+				continue
+			if key in ['bysetpos', 'bymonth', 'bymonthday', 'byyearday', 'byweekno', 'byweekday']:
+				# Convert CommaSeparatedInteger fields into lists of integers
+				model_dict[key] = [int(x) for x in value]
+
+		# Delete the keys from the list we just made
 		for item in to_remove:
 			del model_dict[item]
 
-		# Convert dtstart to a datetime object
-		model_dict['dtstart'] = datetime.strptime(model_dict['dtstart'], '%Y-%m-%d')
-		rrule_obj = rrule(FREQUENCY_MAP[self.frequency], **model_dict)
+		rrule_obj = rrule(RECURRENCE_FREQ_MAP[self.frequency], **model_dict)
 
 		return rrule_obj.between(start_date, end_date, inc=True) 
 	

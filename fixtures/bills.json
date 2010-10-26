@@ -1,14 +1,4 @@
 [
-  {"pk": 1, "model": "auth.user", 
-    "fields": {"username": "davidkrisch", "first_name": "David", "last_name": "Krisch", 
-      "email": "david.krisch@yahoo.com", "password": "", "is_staff": false, 
-      "is_active": true, "is_superuser": false, "last_login": "2010-01-31", 
-      "date_joined": "2009-08-30"}}, 
-  {"pk": 2, "model": "auth.user", 
-    "fields": {"username": "johnsmith", "first_name": "John", "last_name": "Smith", 
-      "email": "johnsmith@example.com", "password": "", "is_staff": false, 
-      "is_active": true, "is_superuser": false, "last_login": "2010-04-30", 
-      "date_joined": "2010-01-01"}}, 
   {
     "pk": 3, 
     "model": "site.bill", 

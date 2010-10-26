@@ -3,6 +3,10 @@ from billtally.site.models import Bill, Recurrence
 from django.contrib.auth.models import User
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
+
+def get_date(date_str):
+	return datetime.strptime(date_str, '%Y-%m-%d').date()
 
 class BillModelTest(TestCase):
 	'''Test the Bill model'''
@@ -27,6 +31,7 @@ class BillModelTest(TestCase):
 		recurrence = Recurrence(**self.recurrence_data)
 		recurrence.bill = bill
 		recurrence.save()
+		start = datetime(2030, 12, 15)
 		self.assertTrue(Bill.objects.count(), 1)
 		self.assertTrue(bill.recurrence_set.count(), 1)
 
@@ -37,12 +42,29 @@ class BillModelTest(TestCase):
 		recurrence = Recurrence(**self.recurrence_data)
 		recurrence.bill = bill
 		recurrence.save()
+		recurrence = Recurrence.objects.all()[0]
 		r_list = recurrence.as_list()
 		self.assertEquals(len(r_list), 1)  
 
 		# The next due date should be the first day of next month
 		expected = datetime.today() + relativedelta(day=1, months=+1)
 		self.assertEquals(r_list[0].date(), expected.date())
+
+	def test_as_list_with_until_set(self):
+		'''Test as_list with an until set in recurrence'''
+		bill = Bill(**self.bill_data)
+		bill.save()
+		self.recurrence_data['until'] = '2010-11-30'
+		recurrence = Recurrence(**self.recurrence_data)
+		recurrence.bill = bill
+		recurrence.save()
+		recurrence = Recurrence.objects.all()[0]
+		r_list = recurrence.as_list(start_date=datetime(2010, 10, 15))
+		self.assertEquals(len(r_list), 1)  
+
+		# The next due date should be the first day of next month
+		self.assertEquals(r_list[0], datetime(2010, 11, 1))
+
 
 	def test_as_list_with_startdate(self):
 		'''Test as_list with a start date'''
@@ -51,6 +73,7 @@ class BillModelTest(TestCase):
 		recurrence = Recurrence(**self.recurrence_data)
 		recurrence.bill = bill
 		recurrence.save()
+		recurrence = Recurrence.objects.all()[0]
 		start = datetime(2030, 12, 15)
 		r_list = recurrence.as_list(start_date=start)
 		expected = start + relativedelta(day=1, months=+1)
@@ -63,6 +86,8 @@ class BillModelTest(TestCase):
 		recurrence = Recurrence(**self.recurrence_data)
 		recurrence.bill = bill
 		recurrence.save()
+		recurrence = Recurrence.objects.all()[0]
+		start = datetime(2030, 12, 15)
 		start = datetime(2010, 11, 15)
 		end = datetime(2010, 12, 15)
 		r_list = recurrence.as_list(start_date=start, end_date=end)
@@ -70,7 +95,7 @@ class BillModelTest(TestCase):
 		self.assertEquals(r_list[0].date(), datetime(2010, 12, 1).date())
 
 class BillViewTest(TestCase):
-	fixtures = ['bills.json']
+	fixtures = ['users.json', 'bills.json']
 
 	def setUp(self):
 		'''Set User passwords and log one in'''
@@ -88,6 +113,23 @@ class BillViewTest(TestCase):
 		self.assertTrue(len(response.context['paid']) == 2)
 		self.assertTrue(len(response.context['overdue']) == 1)
 
+class CreateBillTest(TestCase):
+	fixtures = ['users.json']
+
+	def setUp(self):
+		'''Set User passwords and log one in'''
+		for user in User.objects.all():
+			user.set_password('password')
+			user.save()
+		self.client.login(username='davidkrisch', password='password')
+		self.simple_bill = {'name': 'Grocery Shopping', 'amount': '64.57',
+				'date': '2010-07-20', 'is_paid': False}
+		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
+				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
+				'repeats': 'monthly', 'repeat_every': 15, 'repeat_by': 'day_of_month',
+				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
+
+
 	def test_create_bill_get(self):
 		"""Test that GET returns a form with the proper template context"""
 		response = self.client.get('/create/')
@@ -97,24 +139,29 @@ class BillViewTest(TestCase):
 
 	def test_create_simple_bill(self):
 		"""Test that create bill adds a single new bill"""
-		num_bills_before = Bill.objects.count()
-		response = self.client.post('/create/', 
-				{'name': 'Grocery Shopping', 'amount': '64.57', 'date': '07/10/2010',
-					'is_paid': False}, follow=True)
+		response = self.client.post('/create/', self.simple_bill, follow=True)
 		self.assertRedirects(response, '/list/')
-		num_bills_after = Bill.objects.count()
-		self.assertEqual(num_bills_before + 1, num_bills_after)
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.simple_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.simple_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.simple_bill['amount']), bill.amount) 
+		self.assertEqual(self.simple_bill['is_paid'], bill.is_paid) 
 
 	def test_create_recurring_bill_monthly(self):
 		"""Test that creating a recurring bill adds a single new bill"""
-		num_recur_before = Recurrence.objects.count()
-		num_bill_before = Bill.objects.count()
-		response = self.client.post('/create/',
-				{'name': 'Gym Membership', 'amount': '39.90', 'date': '07/20/2010',
-					'is_paid': False, 'does_repeat': 'true', 'repeats': 'monthly', 
-					'repeat_every': 15, 'repeat_by': 'day_of_month', 'repeat_every': 1, 
-					'has_end': 'until', 'end_date': '2011-10-15'}, follow=True) 
-		num_recur_after = Recurrence.objects.count()
-		num_bill_after = Bill.objects.count()
-		self.assertEqual(num_bill_before + 1, num_bill_after)
-		self.assertEqual(num_recur_before + 1, num_recur_after)
+		response = self.client.post('/create/', self.recurring_bill, follow=True) 
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.recurring_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.recurring_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.recurring_bill['amount']), bill.amount) 
+		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
+		recurrences = Recurrence.objects.all()
+		self.assertEqual(1, len(recurrences))
+		as_list = recurrences[0].as_list()
+		self.assertEqual(1, len(as_list))
+		date = as_list[0]
+		self.assertEqual(datetime(2010, 11, 1), date)
