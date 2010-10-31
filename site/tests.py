@@ -169,7 +169,7 @@ class CreateBillTest(TestCase):
 
 	def test_create_recurring_bill_monthly_by_day_of_week(self):
 		"""Test that creating a recurring bill adds a single new bill - monthly - by day of week
-				An example is monthly on the third Friday of the month	
+				An example is monthly on the third Tuesday of the month	
 		"""
 		self.recurring_bill['repeats'] = 'monthly'
 		self.recurring_bill['repeat_by'] = 'day_of_week'
@@ -183,10 +183,13 @@ class CreateBillTest(TestCase):
 		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
 		recurrences = Recurrence.objects.all()
 		self.assertEqual(1, len(recurrences))
-		as_list = recurrences[0].as_list()
-		self.assertEqual(1, len(as_list))
-		date = as_list[0]
-		self.assertEqual(datetime(2010, 11, 1), date)
+		startdate = datetime(2010, 8, 30)
+		enddate = datetime(2010, 10, 14)
+		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
+		self.assertEqual(3, len(as_list))
+		self.assertEqual(datetime(2010, 8, 17), as_list[0])
+		self.assertEqual(datetime(2010, 9, 21), as_list[1])
+		self.assertEqual(datetime(2010, 10, 19), as_list[2])
 
 	def test_create_recurring_bill_weekly(self):
 		"""Test that creating a recurring bill adds a single new bill - weekly"""

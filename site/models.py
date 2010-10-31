@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 import csv
 
 RECURRENCE_FREQ_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
-#RECURRENCE_WEEKDAY_MAP = {'SU': SU, 'MO': MO, 'TU': TU, 'WE': WE, 'TH': TH, 'FR': FR, 'SA': SA}
+RRULE_WEEKDAY_MAP = {0: MO, 1: TU, 2: WE, 3: TH, 4: FR, 5: SA, 6: SU}
 RECURRENCE_WEEKDAY_MAP = {'MO': 0, 'TU': 1, 'WE': 2, 'TH': 3, 'FR': 4, 'SA': 5, 'SU': 6}
 
 class Bill(models.Model):

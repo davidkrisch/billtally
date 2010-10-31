@@ -3,8 +3,10 @@ from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from models import Bill, Recurrence
+from models import Bill, Recurrence, RRULE_WEEKDAY_MAP
 from forms import BillForm, RecurrenceForm
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import *
 
 def api_create_bill(request):
 	"""Create a Bill and the corresponding Recurrance if necessary
@@ -64,10 +66,16 @@ def create_bill(request):
 					if repeat_by == 'day_of_month':
 						recurrence_obj.bymonthday = repeat_every
 					elif repeat_by == 'day_of_week':
-						# Figure out what day of the week it starts on
+						# 'Monthly on the third Friday'
+						temp = recurrence_obj.dtstart
+						i = 0
+						while temp.month == recurrence_obj.dtstart.month:
+							temp = temp + relativedelta(weeks=-1)
+							i += 1
+						import pdb; pdb.set_trace()
 						weekday = recurrence_obj.dtstart.weekday()
-						pass
-						# TODO 'Monthly on the third Friday'
+						wd = RRULE_WEEKDAY_MAP[weekday](i)
+						# TODO figure out how to put TU(3) into the database
 				elif repeats == 'weekly':
 					recurrence_obj.frequency = 'weekly'
 					repeat_on = recurrence_form.cleaned_data['repeat_on'] 
