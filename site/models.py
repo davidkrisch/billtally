@@ -53,6 +53,7 @@ class Recurrence(models.Model):
 	byyearday = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True) 
 	byweekno = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True) 
 	byweekday = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True) 
+	byweekdaycount = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True)
 	bill = models.ForeignKey(Bill, editable=False)
 	objects = RecurrenceManager()
 
@@ -90,7 +91,8 @@ class Recurrence(models.Model):
 			if not value:
 				to_remove.append(key)
 				continue
-			if key in ['bysetpos', 'bymonth', 'bymonthday', 'byyearday', 'byweekno', 'byweekday']:
+			if key in ['bysetpos', 'bymonth', 'bymonthday', 
+										'byyearday', 'byweekno', 'byweekday', 'byweekdaycount']:
 				# Convert CommaSeparatedInteger fields into lists of integers
 				reader = csv.reader([value.lstrip('[').rstrip(']')])
 				model_dict[key]= [int(x) for x in reader.next()]
@@ -98,6 +100,13 @@ class Recurrence(models.Model):
 		# Delete the keys from the list we just made
 		for item in to_remove:
 			del model_dict[item]
+
+		# Handle the monthly on the second tuesday case
+		if 'byweekdaycount' in model_dict:
+			weekday = model_dict['byweekday'][0]
+			count = model_dict['byweekdaycount'][0]
+			model_dict['byweekday'] = RRULE_WEEKDAY_MAP[weekday](count)
+			del model_dict['byweekdaycount']
 
 		rrule_obj = rrule(RECURRENCE_FREQ_MAP[self.frequency], **model_dict)
 

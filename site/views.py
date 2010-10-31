@@ -72,10 +72,9 @@ def create_bill(request):
 						while temp.month == recurrence_obj.dtstart.month:
 							temp = temp + relativedelta(weeks=-1)
 							i += 1
-						import pdb; pdb.set_trace()
 						weekday = recurrence_obj.dtstart.weekday()
-						wd = RRULE_WEEKDAY_MAP[weekday](i)
-						# TODO figure out how to put TU(3) into the database
+						recurrence_obj.byweekday = [weekday]
+						recurrence_obj.byweekdaycount = i
 				elif repeats == 'weekly':
 					recurrence_obj.frequency = 'weekly'
 					repeat_on = recurrence_form.cleaned_data['repeat_on'] 
