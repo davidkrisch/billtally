@@ -20,6 +20,14 @@ def api_create_bill(request):
 
 @login_required
 def list_bills(request):
+	'''Display the users list of bills
+	
+		Displays bills for the next 30 days by default
+
+		Parameters
+			start - the first date to display bills for
+			end - the last date to display bills for
+	'''
 	if request.method not in ['GET']:
 		return HttpResponseNotAllowed(['GET'])	
 

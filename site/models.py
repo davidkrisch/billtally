@@ -2,10 +2,9 @@ from django.db import models
 from django.forms import ModelForm, BooleanField
 from django.contrib.auth.models import User
 from datetime import datetime
-from datetime import time
 from dateutil.rrule import *
-from dateutil.relativedelta import *
 from django.forms.models import model_to_dict
+from util import get_date_range
 import csv
 
 RECURRENCE_FREQ_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
@@ -73,11 +72,12 @@ class Recurrence(models.Model):
 		if not self.frequency or not self.dtstart:
 			raise Exception('frequency or dtstart not defined')
 		
-		if not start_date:
-			start_date = datetime.today()
-		if not end_date:
-			end_date = start_date + relativedelta(months=+1)
-			end_date = datetime.combine(end_date, time())
+		start_date, end_date = get_date_range(start_date, end_date)
+#		if not start_date:
+#			start_date = datetime.today()
+#		if not end_date:
+#			end_date = start_date + relativedelta(months=+1)
+#			end_date = datetime.combine(end_date, time())
 
 		# Convert this model to a dictionary
 		model_dict = model_to_dict(self, exclude=['id', 'bill'])
