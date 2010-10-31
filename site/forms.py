@@ -1,8 +1,9 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-from models import Bill, Recurrence
+from models import Bill, Recurrence, RECURRENCE_WEEKDAY_MAP
 from registration.models import RegistrationProfile
+from dateutil.rrule import *
 
 class BillForm(forms.ModelForm):
 	"""Form for Bill objects"""
@@ -17,9 +18,11 @@ class RecurrenceForm(forms.Form):
 										('monthly', 'Monthly'), ('yearly', 'Yearly'))
 	repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6),
 													('7', 7),('8', 8), ('9', 9), ('10', 10), ('11', 11), ('12', 12),
-													('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18))
-	weekday_choices = (('Sunday', 'S'), ('Monday', 'M'), ('Tuesday', 'T'), ('Wednesday', 'W'), 
-											('Thursday', 'T'), ('Friday', 'F'), ('Saturday', 'S'))
+													('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18),
+													('19', 19),('20', 20), ('21', 21), ('22', 22), ('23', 23), ('24', 24),
+													('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
+	weekday_choices = ((SU, 'Sunday'), (MO, 'Monday'), (TU, 'Tuesday'), (WE, 'Wednesday'), 
+											(TH, 'Thursday'), (FR, 'Friday'), (SA, 'Saturday'))
 	repeat_by_choices = (('day_of_month', 'day of the Month'), ('day_of_week', 'day of the week'))
 	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
 	
@@ -33,6 +36,29 @@ class RecurrenceForm(forms.Form):
 	has_end =  forms.ChoiceField(widget=forms.RadioSelect(),
 																choices=ends_on_choices)
 	end_date = forms.DateField(required=False)
+
+	def clean_repeat_on(self):
+		"""Turn repeat_on into an array of integers (rrule weekdays objects)"""
+		repeat_on = self.cleaned_data['repeat_on']
+		days = [RECURRENCE_WEEKDAY_MAP[day] for day in repeat_on]
+		self.cleaned_data['repeat_on'] = days
+		return days 
+
+	def clean(self):
+		"""Make sure repeat_by is only set if repeats is monthly
+			Make sure repeat on is only set if repeats is weekly
+		"""
+		cleaned_data = self.cleaned_data
+		repeats = cleaned_data.get('repeats')
+		repeat_on = cleaned_data.get('repeat_on')
+		repeat_by = cleaned_data.get('repeat_by')
+
+		if repeats == 'monthly' and repeat_by == '':
+			raise forms.ValidationError("'Repeat by' must be set when creating a bill that repeats monthly")
+		elif repeats == 'weekly' and repeat_on == '':
+			raise forms.ValidationError("'Repeat on' must be set when creating a bill that repeats weekly")
+
+		return cleaned_data
 
 class RegistrationFormEmailIsUserName(forms.Form):
 	"""

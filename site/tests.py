@@ -126,7 +126,6 @@ class CreateBillTest(TestCase):
 				'date': '2010-07-20', 'is_paid': False}
 		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
 				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
-				'repeats': 'monthly', 'repeat_every': 15, 'repeat_by': 'day_of_month',
 				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
 
 
@@ -150,7 +149,9 @@ class CreateBillTest(TestCase):
 		self.assertEqual(self.simple_bill['is_paid'], bill.is_paid) 
 
 	def test_create_recurring_bill_monthly(self):
-		"""Test that creating a recurring bill adds a single new bill"""
+		"""Test that creating a recurring bill adds a single new bill - monthly"""
+		self.recurring_bill['repeats'] = 'monthly'
+		self.recurring_bill['repeat_by'] = 'day_of_month'
 		response = self.client.post('/create/', self.recurring_bill, follow=True) 
 		bills = Bill.objects.all()
 		self.assertEqual(1, len(bills))
@@ -165,3 +166,72 @@ class CreateBillTest(TestCase):
 		self.assertEqual(1, len(as_list))
 		date = as_list[0]
 		self.assertEqual(datetime(2010, 11, 1), date)
+
+	def test_create_recurring_bill_monthly_by_day_of_week(self):
+		"""Test that creating a recurring bill adds a single new bill - monthly - by day of week
+				An example is monthly on the third Friday of the month	
+		"""
+		self.recurring_bill['repeats'] = 'monthly'
+		self.recurring_bill['repeat_by'] = 'day_of_week'
+		response = self.client.post('/create/', self.recurring_bill, follow=True) 
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.recurring_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.recurring_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.recurring_bill['amount']), bill.amount) 
+		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
+		recurrences = Recurrence.objects.all()
+		self.assertEqual(1, len(recurrences))
+		as_list = recurrences[0].as_list()
+		self.assertEqual(1, len(as_list))
+		date = as_list[0]
+		self.assertEqual(datetime(2010, 11, 1), date)
+
+	def test_create_recurring_bill_weekly(self):
+		"""Test that creating a recurring bill adds a single new bill - weekly"""
+		self.recurring_bill['repeats'] = 'weekly',
+		# Create a bill that occurs weekly on Tuesday
+		self.recurring_bill['repeat_on'] = ['TU']
+		response = self.client.post('/create/', self.recurring_bill, follow=True) 
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.recurring_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.recurring_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.recurring_bill['amount']), bill.amount) 
+		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
+		recurrences = Recurrence.objects.all()
+		self.assertEqual(1, len(recurrences))
+		# Make sure it occurs 2 times between 10/30/2010 and 11/14/2010
+		startdate = datetime(2010, 10, 30)
+		enddate = datetime(2010, 11, 14)
+		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
+		self.assertEqual(2, len(as_list))
+		self.assertEqual(datetime(2010, 11, 2), as_list[0])
+		self.assertEqual(datetime(2010, 11, 9), as_list[1])
+
+	def test_create_recurring_bill_weekly_twice_a_week(self):
+		"""Test that creating a recurring bill adds a single new bill - weekly"""
+		self.recurring_bill['repeats'] = 'weekly',
+		# Create a bill that occurs weekly on Tuesday, Thursday
+		self.recurring_bill['repeat_on'] = ['TU', 'TH']
+		response = self.client.post('/create/', self.recurring_bill, follow=True) 
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.recurring_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.recurring_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.recurring_bill['amount']), bill.amount) 
+		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
+		recurrences = Recurrence.objects.all()
+		self.assertEqual(1, len(recurrences))
+		# Make sure it occurs 4 times between 10/30/2010 and 11/15/2010
+		startdate = datetime(2010, 10, 30)
+		enddate = datetime(2010, 11, 15)
+		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
+		self.assertEqual(4, len(as_list))
+		self.assertEqual(datetime(2010, 11, 2), as_list[0])
+		self.assertEqual(datetime(2010, 11, 4), as_list[1])
+		self.assertEqual(datetime(2010, 11, 9), as_list[2])
+		self.assertEqual(datetime(2010, 11, 11), as_list[3])

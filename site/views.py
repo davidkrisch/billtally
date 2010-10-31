@@ -3,7 +3,7 @@ from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from models import Bill, Recurrence, RECURRENCE_FREQ_MAP
+from models import Bill, Recurrence
 from forms import BillForm, RecurrenceForm
 
 def api_create_bill(request):
@@ -53,27 +53,40 @@ def create_bill(request):
 			recurrence_form = RecurrenceForm(request.POST)
 			if recurrence_form.is_valid():
 				bill_obj.save()
+				recurrence_obj = Recurrence(bill=bill_obj)
+				recurrence_obj.dtstart = bill_obj.date
 				repeats = recurrence_form.cleaned_data['repeats']
 				if repeats == 'monthly':
+					recurrence_obj.frequency = 'monthly'
 					repeat_by = recurrence_form.cleaned_data['repeat_by'] 
 					repeat_every = recurrence_form.cleaned_data['repeat_every']
-					has_end = recurrence_form.cleaned_data['has_end']
-					end_date = recurrence_form.cleaned_data['end_date']
-
-					recurrence_obj = Recurrence(bill=bill_obj)
-					recurrence_obj.frequency = 'monthly'
-					recurrence_obj.dtstart = bill_obj.date
 
 					if repeat_by == 'day_of_month':
 						recurrence_obj.bymonthday = repeat_every
-					else:
+					elif repeat_by == 'day_of_week':
+						# Figure out what day of the week it starts on
+						weekday = recurrence_obj.dtstart.weekday()
 						pass
 						# TODO 'Monthly on the third Friday'
+				elif repeats == 'weekly':
+					recurrence_obj.frequency = 'weekly'
+					repeat_on = recurrence_form.cleaned_data['repeat_on'] 
+					repeat_every = recurrence_form.cleaned_data['repeat_every']
+					recurrence_obj.byweekday = repeat_on
+				elif repeats == 'daily':
+					pass
+				elif repeats == 'yearly':
+					pass
+				else:
+					# TODO should not get here
+					pass
 
-					if has_end:
-						recurrence_obj.until = end_date
+				has_end = recurrence_form.cleaned_data['has_end']
+				if has_end:
+					end_date = recurrence_form.cleaned_data['end_date']
+					recurrence_obj.until = end_date
 
-					recurrence_obj.save()
+				recurrence_obj.save()
 			else:
 				# TODO return form errors
 				print recurrence_form.errors

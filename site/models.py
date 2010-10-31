@@ -6,8 +6,11 @@ from datetime import time
 from dateutil.rrule import *
 from dateutil.relativedelta import *
 from django.forms.models import model_to_dict
+import csv
 
 RECURRENCE_FREQ_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
+#RECURRENCE_WEEKDAY_MAP = {'SU': SU, 'MO': MO, 'TU': TU, 'WE': WE, 'TH': TH, 'FR': FR, 'SA': SA}
+RECURRENCE_WEEKDAY_MAP = {'MO': 0, 'TU': 1, 'WE': 2, 'TH': 3, 'FR': 4, 'SA': 5, 'SU': 6}
 
 class Bill(models.Model):
 	user = models.ForeignKey(User)
@@ -89,7 +92,8 @@ class Recurrence(models.Model):
 				continue
 			if key in ['bysetpos', 'bymonth', 'bymonthday', 'byyearday', 'byweekno', 'byweekday']:
 				# Convert CommaSeparatedInteger fields into lists of integers
-				model_dict[key] = [int(x) for x in value]
+				reader = csv.reader([value.lstrip('[').rstrip(']')])
+				model_dict[key]= [int(x) for x in reader.next()]
 
 		# Delete the keys from the list we just made
 		for item in to_remove:
@@ -102,3 +106,4 @@ class Recurrence(models.Model):
 	class Meta:
 		verbose_name = 'recurrence'
 		verbose_name_plural = 'recurrence'
+
