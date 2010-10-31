@@ -22,8 +22,16 @@ class Bill(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	def get_absolute_url():
+	def get_absolute_url(self):
 		return "/bills/%i/" % self.id
+
+	def get_recurrence(self):
+		recurrence = None
+		try:
+			recurrence = rec.get(bill=self)
+		except:
+			pass
+		return recurrence
 	
 	class Meta:
 		ordering = ['date']
@@ -73,11 +81,6 @@ class Recurrence(models.Model):
 			raise Exception('frequency or dtstart not defined')
 		
 		start_date, end_date = get_date_range(start_date, end_date)
-#		if not start_date:
-#			start_date = datetime.today()
-#		if not end_date:
-#			end_date = start_date + relativedelta(months=+1)
-#			end_date = datetime.combine(end_date, time())
 
 		# Convert this model to a dictionary
 		model_dict = model_to_dict(self, exclude=['id', 'bill'])

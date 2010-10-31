@@ -50,6 +50,7 @@ class BillModelTest(TestCase):
 		expected = datetime.today() + relativedelta(day=1, months=+1)
 		self.assertEquals(r_list[0].date(), expected.date())
 
+
 	def test_as_list_with_until_set(self):
 		'''Test as_list with an until set in recurrence'''
 		bill = Bill(**self.bill_data)
@@ -64,7 +65,6 @@ class BillModelTest(TestCase):
 
 		# The next due date should be the first day of next month
 		self.assertEquals(r_list[0], datetime(2010, 11, 1))
-
 
 	def test_as_list_with_startdate(self):
 		'''Test as_list with a start date'''
@@ -94,7 +94,20 @@ class BillModelTest(TestCase):
 		self.assertEquals(len(r_list), 1)
 		self.assertEquals(r_list[0].date(), datetime(2010, 12, 1).date())
 
-class BillViewTest(TestCase):
+	def test_get_recurrence(self):
+		'''Test that the get_recurrence model method works'''
+		# Bill with no recurrence should return None
+		bill = Bill(**self.bill_data)
+		bill.save()
+		self.assertEqual(bill.get_recurrence(), None)
+
+		# Bill with recurrence should return it
+		recurrence = Recurrence(**self.recurrence_data)
+		recurrence.bill = bill
+		recurrence = recurrence.save()
+		self.assertEqual(bill.get_recurrence(), recurrence)
+
+class ReadBillTest(TestCase):
 	fixtures = ['users.json', 'bills.json']
 
 	def setUp(self):
@@ -106,12 +119,10 @@ class BillViewTest(TestCase):
 
 	def test_bill_list(self):
 		"""Test that the list_bills view returns a list of bills"""
-		response = self.client.get('/list/', follow=True)
+		response = self.client.get('/list/?start=2010-02-01&end=2010-02-28', follow=True)
 		self.failUnlessEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'list.html')
-		self.assertTrue(len(response.context['unpaid']) == 1)
-		self.assertTrue(len(response.context['paid']) == 2)
-		self.assertTrue(len(response.context['overdue']) == 1)
+		self.assertEqual(len(response.context['bill_list']), 4)
 
 class CreateBillTest(TestCase):
 	fixtures = ['users.json']

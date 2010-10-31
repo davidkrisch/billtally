@@ -5,6 +5,11 @@ from models import Bill, Recurrence, RECURRENCE_WEEKDAY_MAP
 from registration.models import RegistrationProfile
 from dateutil.rrule import *
 
+class DateRangeForm(forms.Form):
+	"""Form for start and end dates"""
+	start = forms.DateField(required=False)
+	end = forms.DateField(required=False)
+
 class BillForm(forms.ModelForm):
 	"""Form for Bill objects"""
 	does_repeat = forms.BooleanField(label='Repeat...', required=False)

@@ -3,5 +3,12 @@
 {% block title %}Your Bills{% endblock %}
 
 {% block content %}
-<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
+	{% for bill in bill_list %}
+		<div>
+			<span>{{ bill.date }}</span>
+			<span>{{ bill.name }}</span>
+			<span>${{ bill.amount }}</span>
+		</div>
+	{% endfor %}
+	<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
 {% endblock %}

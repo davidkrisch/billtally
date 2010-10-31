@@ -4,7 +4,8 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
 from models import Bill, Recurrence, RRULE_WEEKDAY_MAP
-from forms import BillForm, RecurrenceForm
+from forms import BillForm, RecurrenceForm, DateRangeForm
+from util import get_date_range
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
 
@@ -24,19 +25,36 @@ def list_bills(request):
 	
 		Displays bills for the next 30 days by default
 
-		Parameters
+		Parameters (optional)
 			start - the first date to display bills for
 			end - the last date to display bills for
 	'''
 	if request.method not in ['GET']:
 		return HttpResponseNotAllowed(['GET'])	
 
-	bills = Bill.objects.filter(user=request.user)
-	unpaid = bills.filter(is_paid=False, date__gt=date.today())
-	paid = bills.filter(is_paid=True)
-	overdue = bills.filter(is_paid=False, date__lte=date.today())
-	return render_to_response('list.html', 
-			{'unpaid': unpaid, 'paid': paid, 'overdue': overdue},
+	start = end = None
+
+	date_range_form = DateRangeForm(request.GET)
+	if date_range_form.is_valid():
+		start_date = date_range_form.cleaned_data['start']
+		end_date = date_range_form.cleaned_data['end']
+		start, end = get_date_range(start=start_date, end=end_date)
+	else:
+		pass
+		# TODO return validation error
+
+	bill_list = []
+	bills = Bill.objects.filter(user=request.user). \
+									filter(date__gte=start, date__lte=end)
+
+	for bill_obj in bills:
+		recurrence = bill_obj.get_recurrence() 
+		if recurrence:
+			bill_list.extend(recurrence.as_list(start_date=start, end_date=end))
+		else:
+			bill_list.append(bill_obj)
+
+	return render_to_response('list.html', {'bill_list': bill_list},
 			context_instance=RequestContext(request))
 
 @login_required
