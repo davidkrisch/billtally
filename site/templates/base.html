@@ -1,22 +1,46 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
 		<title>BillTally - {% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="/bt_static/css/reset-fonts-grids.css">
+		<link rel="stylesheet" type="text/css" href="/bt_static/css/base-min.css">
 	</head>
 	<body>
-		<div id="content">
-			<div>
+		<div id="doc" class="yui-t4">
+			<div id="hd">
 				<span class="sitename">BillTally</span>
 				<span class="login">
 					{% if user.is_authenticated %}
-					Hi, {{ user.username}}. <a href="{% url django.contrib.auth.views.logout %}">Logout</a>	
+					Hi, {{ user.username }}.
+					<a href="{% url django.contrib.auth.views.logout %}">Logout</a>
 					{% else %}
 					<a href="{% url django.contrib.auth.views.login %}">Login</a>
 					<a href="{% url registration_register %}">Register</a>
 					{% endif %}
 				</span>
 			</div>
-			{% block content %}{% endblock %}
+			<div id="bd">
+				<div id="yui-main">
+					<div class="yui-b">
+						{% block content %}{% endblock %}
+					</div>
+				</div>
+				<div class="yui-b">
+					Lorizzle ipsizzle bizzle sit amet, ass adipiscing elit. 
+					I'm in the shizzle sapien velit, fizzle volutpat, black shut 
+					the shizzle up, rizzle vel, that's the shizzle. Its fo rizzle fizzle brizzle.
+					Fo shizzle erizzle. get down get down dolor dapibus turpizzle tempizzle sheezy.
+					Shit pellentesque nibh we gonna chung gangster.
+					Vestibulum in tortor. Pellentesque eleifend rhoncizzle stuff.
+					In mah nizzle dang sheezy dictumst. Check out this dapibizzle.
+					Rizzle crackalackin boofron, pretizzle stuff, mattizzle check out
+					this, eleifend vitae, nunc.
+					Crunk suscipizzle. Integizzle semper velit sizzle nizzle.
+				</div>
+			</div>
+			<div id="ft">
+			</div> 
 		</div>
 	</body>
 </html>
+

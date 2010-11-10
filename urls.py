@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 from django.views.generic.create_update import create_object
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth import views as auth_views
+from django.conf import settings
 from billtally.site import views, models
 from billtally.site.forms import RegistrationFormEmailIsUserName
 from registration.views import register
@@ -32,3 +33,8 @@ urlpatterns += patterns('',
 		(r'^accounts/', include('registration.urls')),
 )
 
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^bt_static/(?P<path>.*)$', 'django.views.static.serve', 
+					{'document_root': settings.STATIC_DOC_ROOT}),
+    )

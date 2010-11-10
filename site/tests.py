@@ -173,7 +173,9 @@ class CreateBillTest(TestCase):
 		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
 		recurrences = Recurrence.objects.all()
 		self.assertEqual(1, len(recurrences))
-		as_list = recurrences[0].as_list()
+		startdate = datetime(2010, 10, 15)
+		enddate = datetime(2010, 11, 15)
+		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
 		self.assertEqual(1, len(as_list))
 		date = as_list[0]
 		self.assertEqual(datetime(2010, 11, 1), date)
