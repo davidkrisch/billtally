@@ -1,46 +1,209 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-	<head>
-		<title>BillTally - {% block title %}{% endblock %}</title>
-		<link rel="stylesheet" type="text/css" href="/bt_static/css/reset-fonts-grids.css">
-		<link rel="stylesheet" type="text/css" href="/bt_static/css/base-min.css">
-	</head>
-	<body>
-		<div id="doc" class="yui-t4">
-			<div id="hd">
-				<span class="sitename">BillTally</span>
-				<span class="login">
-					{% if user.is_authenticated %}
+<!doctype html>  
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ --> 
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>BillTally - {% block title %}{% endblock %}</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--  Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Place favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+  <!-- CSS : implied media="all" -->
+  <link rel="stylesheet" href="/bt_static/css/style.css?v=2">
+
+  <!-- Uncomment if you are specifically targeting less enabled mobile browsers
+  <link rel="stylesheet" media="handheld" href="css/handheld.css?v=2">  -->
+ 
+  <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
+  <script src="/bt_static/js/libs/modernizr-1.6.min.js"></script>
+
+	<style type="text/css" media="screen">
+		/* <![CDATA[ */
+		body {
+			width: 750px;
+			padding-top: 19px;
+			margin: 0px auto;
+			position: relative;
+			font-size: 108%;
+		}
+		header {
+			padding-bottom: 10px;
+			border-bottom: 2px solid #444;
+		}
+		#title {
+			font-size: 197%;
+		}
+		#user {
+			float:right;
+			margin-top: 19px;
+		}
+		#main {
+			margin-top: 40px;
+			width: 75%;
+		}
+		#billlist {
+			clear: both;
+		}
+		.bill {
+			width: 100%;
+			padding: 10px 15px;
+			margin: 10px 0;
+			border: 1px solid #ccc; 
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+		}
+		.bill a {
+			text-decoration: none;
+			font-size: 77%;
+			color: #aaa;
+		}
+		.date {
+			width: 15%;
+			float: left;
+		}
+		.name {
+			width: 65%;
+			float: left;
+		}
+		.amount {
+			width: 20%;
+			float: right;
+			text-align: right;
+		}
+		.actions {
+			clear: both;
+			padding-top: 10px;
+			text-align: right;
+		}
+		a.delete {
+			color: #992600;
+		}
+		a.edit {
+			color: #009926;
+		}
+		.partial {
+			clear: both;
+			margin-left: 140px;
+			padding-top: 10px;
+			font-size: 85%;
+			color: #999;
+		}
+		#nav {
+			padding-bottom: 10px;
+			text-align: center;
+		}
+		#nav #current {
+			font-size: 123.1%;
+			margin: 0 15px 0 15px;
+		}
+		#nav a {
+			font-size: 77%;
+			text-decoration: none;
+		}
+		#add {
+			width: 100%;
+		}
+		#add a {
+			font-size: 85%;
+			text-decoration: none;
+			float: right;
+		}
+		/* ]]> */
+	</style>
+
+</head>
+
+<body>
+	<div id="doc" class="yui-t4">
+		<div id="bd">
+			<div id="yui-main">
+				<div class="yui-b">
+				</div>
+			</div>
+		</div>
+		<div id="ft">
+		</div> 
+	</div>
+
+  <div id="container">
+    <header>
+			<div id="user">
+				{% if user.is_authenticated %}
 					Hi, {{ user.username }}.
+					<a href="#">Account</a>
 					<a href="{% url django.contrib.auth.views.logout %}">Logout</a>
-					{% else %}
+				{% else %}
 					<a href="{% url django.contrib.auth.views.login %}">Login</a>
 					<a href="{% url registration_register %}">Register</a>
-					{% endif %}
-				</span>
+				{% endif %}
 			</div>
-			<div id="bd">
-				<div id="yui-main">
-					<div class="yui-b">
-						{% block content %}{% endblock %}
-					</div>
-				</div>
-				<div class="yui-b">
-					Lorizzle ipsizzle bizzle sit amet, ass adipiscing elit. 
-					I'm in the shizzle sapien velit, fizzle volutpat, black shut 
-					the shizzle up, rizzle vel, that's the shizzle. Its fo rizzle fizzle brizzle.
-					Fo shizzle erizzle. get down get down dolor dapibus turpizzle tempizzle sheezy.
-					Shit pellentesque nibh we gonna chung gangster.
-					Vestibulum in tortor. Pellentesque eleifend rhoncizzle stuff.
-					In mah nizzle dang sheezy dictumst. Check out this dapibizzle.
-					Rizzle crackalackin boofron, pretizzle stuff, mattizzle check out
-					this, eleifend vitae, nunc.
-					Crunk suscipizzle. Integizzle semper velit sizzle nizzle.
-				</div>
-			</div>
-			<div id="ft">
-			</div> 
-		</div>
-	</body>
-</html>
+			<h1 id="title">BillTally</h1>
+    </header>
+    
+    <div id="main">
+			{% block content %}{% endblock %}
+    </div>
+    
+    <footer>
 
+    </footer>
+  </div> <!--! end of #container -->
+
+
+  <!-- Javascript at the bottom for fast page loading -->
+
+  <!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="js/libs/jquery-1.4.2.js"%3E%3C/script%3E'))</script>
+  
+  
+  <!-- scripts concatenated and minified via ant build script-->
+  <script src="/bt_static/js/plugins.js"></script>
+  <script src="/bt_static/js/script.js"></script>
+  <!-- end concatenated and minified scripts-->
+  
+  
+  <!--[if lt IE 7 ]>
+    <script src="js/libs/dd_belatedpng.js"></script>
+    <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
+  <![endif]-->
+
+  <!-- yui profiler and profileviewer - remove for production -->
+  <script src="/bt_static/js/profiling/yahoo-profiling.min.js"></script>
+  <script src="/bt_static/js/profiling/config.js"></script>
+  <!-- end profiling code -->
+
+
+  <!-- asynchronous google analytics: mathiasbynens.be/notes/async-analytics-snippet 
+       change the UA-XXXXX-X to be your site's ID -->
+  <script>
+   var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+   (function(d, t) {
+    var g = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+    g.async = true;
+    g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g, s);
+   })(document, 'script');
+  </script>
+  
+</body>
+</html>

@@ -3,12 +3,28 @@
 {% block title %}Your Bills{% endblock %}
 
 {% block content %}
+	<div id="nav">
+		<a href="#" class="nav">&lt;&lt; previous 30 days</a>
+		<span id="current">November 1 - November 30</span>
+		<a href="#" class="nav">next 30 days &gt;&gt;</a>
+	</div>
+	<div id="add">
+		<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
+	</div>
+
 	{% for bill in bill_list %}
-		<div>
-			<span>{{ bill.date }}</span>
-			<span>{{ bill.name }}</span>
-			<span>${{ bill.amount }}</span>
+		<div id="billlist">
+			<div class="bill">
+				<div class="amount">${{ bill.amount }}</div>
+				<div class="date">{{ bill.date|date:"M j" }}</div>
+				<div class="name">{{ bill.name }}</div>
+				<div class="partial"></div>
+				<div class="actions">
+						<a href="#" class="edit">Pay this Bill</a> •
+						<a href="#">Edit</a> •
+						<a href="#" class="delete">Delete</a>
+				</div>
+			</div>
 		</div>
 	{% endfor %}
-	<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
 {% endblock %}
