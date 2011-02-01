@@ -24,14 +24,6 @@ class Bill(models.Model):
 
 	def get_absolute_url(self):
 		return "/bills/%i/" % self.id
-
-	def get_recurrence(self):
-		recurrence = None
-		try:
-			recurrence = rec.get(bill=self)
-		except:
-			pass
-		return recurrence
 	
 	class Meta:
 		ordering = ['date']
@@ -63,6 +55,9 @@ class Recurrence(models.Model):
 	byweekdaycount = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True)
 	bill = models.ForeignKey(Bill, editable=False)
 	objects = RecurrenceManager()
+
+	def __unicode__(self):
+		return "Recurring %s" % self.bill.name
 
 	def as_list(self, start_date=None, end_date=None):
 		'''Retrieve this Recurrence as a list of dates that this recurrence represents

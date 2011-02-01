@@ -4,9 +4,9 @@
 
 {% block content %}
 	<div id="nav">
-		<a href="#" class="nav">&lt;&lt; previous 30 days</a>
-		<span id="current">November 1 - November 30</span>
-		<a href="#" class="nav">next 30 days &gt;&gt;</a>
+		<a href="{% url billtally.site.views.list_bills %}?start={{ prev_start|date:"Y-m-d" }}&end={{ prev_end|date:"Y-m-d" }}" class="nav">&lt;&lt; previous 30 days</a>
+		<span id="current">{{ start_date|date:"M j" }} - {{ end_date|date:"M j" }}</span>
+		<a href="{% url billtally.site.views.list_bills %}?start={{ next_start|date:"Y-m-d" }}&end={{ next_end|date:"Y-m-d" }}" class="nav">next 30 days &gt;&gt;</a>
 	</div>
 	<div id="add">
 		<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>

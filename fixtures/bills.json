@@ -20,7 +20,17 @@
       "name": "Mortgage", 
       "is_paid": false 
     }
-  }, 
+  },
+	{
+    "pk": 1, 
+    "model": "site.recurrence",
+    "fields": {
+			"frequency": "monthly",
+			"dtstart": "2010-02-05",
+			"bymonthday": 5,
+			"bill": 1
+    }
+	},
   {
     "pk": 2, 
     "model": "site.bill", 

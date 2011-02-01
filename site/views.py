@@ -39,23 +39,42 @@ def list_bills(request):
 		start_date = date_range_form.cleaned_data['start']
 		end_date = date_range_form.cleaned_data['end']
 		start, end = get_date_range(start=start_date, end=end_date)
+
+		# TODO create a unit test for this
+		next_start, next_end = get_date_range(start=end+relativedelta(days=+1)) 
+		prev_start, prev_end = get_date_range(end=start+relativedelta(days=-1)) 
 	else:
 		pass
 		# TODO return validation error
 
 	bill_list = []
+
+	recurrences = Recurrence.objects.filter(bill__user=request.user)
+	for recurrence in recurrences:
+		occurrences = recurrence.as_list(start_date=start, end_date=end)
+		for date in occurrences:
+			to_add = recurrence.bill
+			to_add.date = date
+			bill_list.append(to_add)
+
 	bills = Bill.objects.filter(user=request.user). \
 									filter(date__gte=start, date__lte=end)
+	for bill in bills:
+		if not bill_in_list(bill_list, bill):
+			bill_list.append(bill)
 
-	for bill_obj in bills:
-		recurrence = bill_obj.get_recurrence() 
-		if recurrence:
-			bill_list.extend(recurrence.as_list(start_date=start, end_date=end))
-		else:
-			bill_list.append(bill_obj)
-
-	return render_to_response('list.html', {'bill_list': bill_list},
+	return render_to_response('list.html', 
+			{'bill_list': bill_list, 'start_date': start, 'end_date': end,
+			 'next_start': next_start, 'next_end': next_end, 
+			 'prev_start': prev_start, 'prev_end': prev_end},
 			context_instance=RequestContext(request))
+
+def bill_in_list(list, bill):
+	'''Return True if bill is in list, false otherwise'''
+	for b in list:
+		if b.id == bill.id:
+			return True
+	return False
 
 @login_required
 def create_bill(request):

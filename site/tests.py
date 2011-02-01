@@ -94,19 +94,6 @@ class BillModelTest(TestCase):
 		self.assertEquals(len(r_list), 1)
 		self.assertEquals(r_list[0].date(), datetime(2010, 12, 1).date())
 
-	def test_get_recurrence(self):
-		'''Test that the get_recurrence model method works'''
-		# Bill with no recurrence should return None
-		bill = Bill(**self.bill_data)
-		bill.save()
-		self.assertEqual(bill.get_recurrence(), None)
-
-		# Bill with recurrence should return it
-		recurrence = Recurrence(**self.recurrence_data)
-		recurrence.bill = bill
-		recurrence = recurrence.save()
-		self.assertEqual(bill.get_recurrence(), recurrence)
-
 class ReadBillTest(TestCase):
 	fixtures = ['users.json', 'bills.json']
 

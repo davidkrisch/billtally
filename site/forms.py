@@ -7,8 +7,8 @@ from dateutil.rrule import *
 
 class DateRangeForm(forms.Form):
 	"""Form for start and end dates"""
-	start = forms.DateField(required=False)
-	end = forms.DateField(required=False)
+	start = forms.DateTimeField(required=False)
+	end = forms.DateTimeField(required=False)
 
 class BillForm(forms.ModelForm):
 	"""Form for Bill objects"""
