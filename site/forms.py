@@ -28,7 +28,7 @@ class RecurrenceForm(forms.Form):
 													('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
 	weekday_choices = ((SU, 'Sunday'), (MO, 'Monday'), (TU, 'Tuesday'), (WE, 'Wednesday'), 
 											(TH, 'Thursday'), (FR, 'Friday'), (SA, 'Saturday'))
-	repeat_by_choices = (('day_of_month', 'day of the Month'), ('day_of_week', 'day of the week'))
+	repeat_by_choices = (('day_of_month', 'day of the month'), ('day_of_week', 'day of the week'))
 	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
 	
 	repeats = forms.ChoiceField(choices=repeat_choices)

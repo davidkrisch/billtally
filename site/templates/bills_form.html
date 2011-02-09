@@ -2,9 +2,58 @@
 {% block title %}Create Bill{% endblock %}
 
 {% block content %}
+<h1>Add a new bill:</h1>
 <form action="/create/" method="post">
-	{{ bill_form.as_p }}
-	{{ recurrence_form.as_p }}
+	<table>
+		<tbody>
+			<th>{{ bill_form.name.label }}:</th>
+			<td>{{ bill_form.name }}</td>
+		</tbody>	
+		<tbody>
+			<th>{{ bill_form.amount.label }}:</th>
+			<td>{{ bill_form.amount }}</td>
+		</tbody>	
+		<tbody>
+			<th>{{ bill_form.date.label }}:</th>
+			<td>{{ bill_form.date }}</td>
+		</tbody>	
+		<tbody>
+			<th>{{ bill_form.is_paid.label }}:</th>
+			<td>{{ bill_form.is_paid }}</td>
+		</tbody>	
+		<tbody>
+			<th>{{ bill_form.does_repeat.label }}</th>
+			<td>{{ bill_form.does_repeat }}</td>
+		</tbody>	
+	</table>	
+	
+	<table id="repeat">
+		<tbody>
+			<tr>
+				<th>Repeats: </th>
+				<td>{{ recurrence_form.repeats }}</td>
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<th>Repeat every: </th>
+				<td>{{ recurrence_form.repeat_every }} months</td>
+			</tr>
+			<tr>
+				<th>Repeat by: </th>
+				<td>{{ recurrence_form.repeat_by }}</td>
+			</tr>
+			<tr>
+				<th>Ends: </th>
+				<td>{{ recurrence_form.has_end }}</td>
+			</tr>
+			<tr>
+				<th>End date: </th>
+				<td>{{ recurrence_form.end_date }}</td>
+			</tr>
+		</tbody>
+	</table>
 	<input type="submit" value="Submit"/>
+	<input type="button" value="Cancel"/>
 </form>
 {% endblock %}

@@ -36,10 +36,10 @@ class RecurrenceManager(models.Manager):
 
 class Recurrence(models.Model):
 	FREQUENCY_CHOICES = (
-	            ('DAILY', 'daily'),
-	            ('WEEKLY', 'weekly'),
-	            ('MONTHLY', 'monthly'),
-	            ('YEARLY', 'yearly'),
+	            ('daily', 'DAILY'),
+	            ('weekly', 'WEEKLY'),
+	            ('monthly', 'MONTHLY'),
+	            ('yearly', 'YEARLY'),
 	        )
 	frequency = models.CharField(max_length=7, choices=FREQUENCY_CHOICES)
 	dtstart = models.DateField()

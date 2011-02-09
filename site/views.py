@@ -109,7 +109,8 @@ def create_bill(request):
 					repeat_every = recurrence_form.cleaned_data['repeat_every']
 
 					if repeat_by == 'day_of_month':
-						recurrence_obj.bymonthday = repeat_every
+						recurrence_obj.repeat_every = repeat_every
+						recurrence_obj.bymonthday = bill_obj.date.day
 					elif repeat_by == 'day_of_week':
 						# 'Monthly on the third Friday'
 						temp = recurrence_obj.dtstart
