@@ -25,32 +25,64 @@
 			<th>{{ bill_form.does_repeat.label }}</th>
 			<td>{{ bill_form.does_repeat }}</td>
 		</tbody>	
+		<tbody>
+			<th>{{ bill_form.repeats.label }}</th>
+			<td>{{ bill_form.repeats }}</td>
+		</tbody>	
 	</table>	
+
+	<table>
+		<tbody>
+			<th>{{ recur_freq_form.repeats.label }}:</th>
+			<td>{{ recur_freq_form.repeats }}</td>
+		</tbody>	
+	</table>
 	
-	<table id="repeat">
+	<table id="repeat_daily">
 		<tbody>
 			<tr>
-				<th>Repeats: </th>
-				<td>{{ recurrence_form.repeats }}</td>
+				<th>{{ daily_recurrence_form.repeat_every.label }}: </th>
+				<td>{{ daily_recurrence_form.repeat_every }} days</td>
 			</tr>
+			{% include "bills_form_has_end.html" %}
 		</tbody>
+	</table>
+
+	<table id="repeat_weekly">
 		<tbody>
 			<tr>
-				<th>Repeat every: </th>
-				<td>{{ recurrence_form.repeat_every }} months</td>
+				<th>{{ weekly_recurrence_form.repeat_every.label }}: </th>
+				<td>{{ weekly_recurrence_form.repeat_every }} weeks</td>
 			</tr>
 			<tr>
-				<th>Repeat by: </th>
-				<td>{{ recurrence_form.repeat_by }}</td>
+				<th>{{ weekly_recurrence_form.repeat_on.label }}: </th>
+				<td>{{ weekly_recurrence_form.repeat_on }}</td>
+			</tr>
+			{% include "bills_form_has_end.html" %}
+		</tbody>
+	</table>
+
+	<table id="repeat_monthly">
+		<tbody>
+			<tr>
+				<th>{{ monthly_recurrence_form.repeat_every.label }}: </th>
+				<td>{{ monthly_recurrence_form.repeat_every }} months</td>
 			</tr>
 			<tr>
-				<th>Ends: </th>
-				<td>{{ recurrence_form.has_end }}</td>
+				<th>{{ monthly_recurrence_form.repeat_by.label }}: </th>
+				<td>{{ monthly_recurrence_form.repeat_by }}</td>
 			</tr>
+			{% include "bills_form_has_end.html" %}
+		</tbody>
+	</table>
+
+	<table id="repeat_yearly">
+		<tbody>
 			<tr>
-				<th>End date: </th>
-				<td>{{ recurrence_form.end_date }}</td>
+				<th>{{ daily_recurrence_form.repeat_every.label }}: </th>
+				<td>{{ daily_recurrence_form.repeat_every }} years</td>
 			</tr>
+			{% include "bills_form_has_end.html" %}
 		</tbody>
 	</table>
 	<input type="submit" value="Submit"/>

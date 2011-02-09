@@ -5,6 +5,7 @@ from models import Bill, Recurrence, RECURRENCE_WEEKDAY_MAP
 from registration.models import RegistrationProfile
 from dateutil.rrule import *
 
+
 class DateRangeForm(forms.Form):
 	"""Form for start and end dates"""
 	start = forms.DateTimeField(required=False)
@@ -13,34 +14,45 @@ class DateRangeForm(forms.Form):
 class BillForm(forms.ModelForm):
 	"""Form for Bill objects"""
 	does_repeat = forms.BooleanField(label='Repeat...', required=False)
+
 	class Meta:
 		model = Bill
 		exclude = ('user', 'parent')
 
-class RecurrenceForm(forms.Form):
-	"""Form for Recurrence objects"""
+class RecurFreqForm(forms.Form):
+	"""Form to tell how often the bill repeats"""
 	repeat_choices = (('daily', 'Daily'), ('weekly', 'Weekly'), 
 										('monthly', 'Monthly'), ('yearly', 'Yearly'))
+	repeats = forms.ChoiceField(choices=repeat_choices)
+
+class BaseRecurrenceForm(forms.Form):
+	"""Base form for recurring bills"""
 	repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6),
 													('7', 7),('8', 8), ('9', 9), ('10', 10), ('11', 11), ('12', 12),
 													('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18),
 													('19', 19),('20', 20), ('21', 21), ('22', 22), ('23', 23), ('24', 24),
 													('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
+	repeat_every = forms.ChoiceField(choices=repeat_every_choices)
+
+class BillEndForm(forms.Form):
+	"""Form for the end of recurrence"""
+	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
+
+	has_end =  forms.ChoiceField(widget=forms.RadioSelect(),
+																choices=ends_on_choices,
+																label='Ends',
+																initial='never')
+	end_date = forms.DateField(required=False)
+
+class DailyRecurrenceForm(BaseRecurrenceForm):
+	"""Form for a bill that occurs daily"""
+	pass
+
+class WeeklyRecurrenceForm(BaseRecurrenceForm):
+	"""Form for a bill that occurs weekly"""
 	weekday_choices = ((SU, 'Sunday'), (MO, 'Monday'), (TU, 'Tuesday'), (WE, 'Wednesday'), 
 											(TH, 'Thursday'), (FR, 'Friday'), (SA, 'Saturday'))
-	repeat_by_choices = (('day_of_month', 'day of the month'), ('day_of_week', 'day of the week'))
-	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
-	
-	repeats = forms.ChoiceField(choices=repeat_choices)
-	repeat_every = forms.ChoiceField(choices=repeat_every_choices)
-	# Only used for weekly
 	repeat_on = forms.MultipleChoiceField(choices=weekday_choices, required=False)
-	# Only used for monthly
-	repeat_by = forms.ChoiceField(widget=forms.RadioSelect(),
-																choices=repeat_by_choices, required=False)
-	has_end =  forms.ChoiceField(widget=forms.RadioSelect(),
-																choices=ends_on_choices)
-	end_date = forms.DateField(required=False)
 
 	def clean_repeat_on(self):
 		"""Turn repeat_on into an array of integers (rrule weekdays objects)"""
@@ -49,21 +61,15 @@ class RecurrenceForm(forms.Form):
 		self.cleaned_data['repeat_on'] = days
 		return days 
 
-	def clean(self):
-		"""Make sure repeat_by is only set if repeats is monthly
-			Make sure repeat on is only set if repeats is weekly
-		"""
-		cleaned_data = self.cleaned_data
-		repeats = cleaned_data.get('repeats')
-		repeat_on = cleaned_data.get('repeat_on')
-		repeat_by = cleaned_data.get('repeat_by')
+class MonthlyRecurrenceForm(BaseRecurrenceForm):
+	"""Form for a bill that occurs monthly"""
+	repeat_by_choices = (('day_of_month', 'day of the month'), ('day_of_week', 'day of the week'))
+	repeat_by = forms.ChoiceField(widget=forms.RadioSelect(),
+																choices=repeat_by_choices, required=False)
 
-		if repeats == 'monthly' and repeat_by == '':
-			raise forms.ValidationError("'Repeat by' must be set when creating a bill that repeats monthly")
-		elif repeats == 'weekly' and repeat_on == '':
-			raise forms.ValidationError("'Repeat on' must be set when creating a bill that repeats weekly")
-
-		return cleaned_data
+class YearlyRecurrenceForm(BaseRecurrenceForm):
+	"""Form for a bill that occurs yearly"""
+	pass
 
 class RegistrationFormEmailIsUserName(forms.Form):
 	"""

@@ -3,8 +3,10 @@ from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from models import Bill, Recurrence, RRULE_WEEKDAY_MAP
-from forms import BillForm, RecurrenceForm, DateRangeForm
+from models import Bill, Recurrence, RRULE_WEEKDAY_MAP, RECURRENCE_FREQ_MAP
+from forms import BillForm, DateRangeForm, RecurFreqForm, BillEndForm
+from forms import DailyRecurrenceForm, WeeklyRecurrenceForm 
+from forms import MonthlyRecurrenceForm, YearlyRecurrenceForm 
 from util import get_date_range
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
@@ -82,11 +84,20 @@ def create_bill(request):
 		return HttpResponseNotAllowed(['GET', 'POST'])
 
 	bill_obj = None
+	bill_form = recur_freq_form = daily_recurrence_form = None
+	weekly_recurrence_form = monthly_recurrence_form = None
+	yearly_recurrence_form = bill_end_form = None
 
 	if request.method == 'GET':
-		return render_to_response('bills_form.html', 
-				{'bill_form': BillForm(), 'recurrence_form': RecurrenceForm()},
-				 context_instance=RequestContext(request))
+		# Pass a bunch of unbound forms to the create form
+		# TODO if this is an edit, display the real data
+		bill_form = BillForm()
+		recur_freq_form = RecurFreqForm()
+		daily_recurrence_form = DailyRecurrenceForm()
+		weekly_recurrence_form = WeeklyRecurrenceForm()
+		monthly_recurrence_form = MonthlyRecurrenceForm()
+		yearly_recurrence_form = YearlyRecurrenceForm()
+		bill_end_form = BillEndForm()
 	else:
 		bill_form = BillForm(request.POST)
 		if bill_form.is_valid():
@@ -97,35 +108,40 @@ def create_bill(request):
 			print bill_form.errors
 
 		if 'does_repeat' in bill_form.data:
-			recurrence_form = RecurrenceForm(request.POST)
-			if recurrence_form.is_valid():
-				bill_obj.save()
-				recurrence_obj = Recurrence(bill=bill_obj)
-				recurrence_obj.dtstart = bill_obj.date
-				repeats = recurrence_form.cleaned_data['repeats']
-				if repeats == 'monthly':
-					recurrence_obj.frequency = 'monthly'
-					repeat_by = recurrence_form.cleaned_data['repeat_by'] 
-					repeat_every = recurrence_form.cleaned_data['repeat_every']
+			frequency_form = RecurFreqForm(request.POST)			
+			if frequency_form.is_valid():
+				repeats = frequency_form.cleaned_data['repeats']
 
-					if repeat_by == 'day_of_month':
-						recurrence_obj.repeat_every = repeat_every
-						recurrence_obj.bymonthday = bill_obj.date.day
-					elif repeat_by == 'day_of_week':
-						# 'Monthly on the third Friday'
-						temp = recurrence_obj.dtstart
-						i = 0
-						while temp.month == recurrence_obj.dtstart.month:
-							temp = temp + relativedelta(weeks=-1)
-							i += 1
-						weekday = recurrence_obj.dtstart.weekday()
-						recurrence_obj.byweekday = [weekday]
-						recurrence_obj.byweekdaycount = i
+				recurrence_obj = Recurrence()
+				recurrence_obj.dtstart = bill_obj.date
+
+				if repeats == 'monthly':
+					monthly_recurrence_form = MonthlyRecurrenceForm(request.POST)
+					if monthly_recurrence_form.is_valid():
+						recurrence_obj.frequency = 'monthly'
+						repeat_by = monthly_recurrence_form.cleaned_data['repeat_by'] 
+						repeat_every = monthly_recurrence_form.cleaned_data['repeat_every']
+
+						if repeat_by == 'day_of_month':
+							recurrence_obj.repeat_every = repeat_every
+							recurrence_obj.bymonthday = bill_obj.date.day
+						elif repeat_by == 'day_of_week':
+							# 'Monthly on the third Friday'
+							temp = recurrence_obj.dtstart
+							i = 0
+							while temp.month == recurrence_obj.dtstart.month:
+								temp = temp + relativedelta(weeks=-1)
+								i += 1
+							weekday = recurrence_obj.dtstart.weekday()
+							recurrence_obj.byweekday = [weekday]
+							recurrence_obj.byweekdaycount = i
 				elif repeats == 'weekly':
-					recurrence_obj.frequency = 'weekly'
-					repeat_on = recurrence_form.cleaned_data['repeat_on'] 
-					repeat_every = recurrence_form.cleaned_data['repeat_every']
-					recurrence_obj.byweekday = repeat_on
+					weekly_recurrence_form = WeeklyRecurrenceForm(request.POST) 
+					if weekly_recurrence_form.is_valid():
+						recurrence_obj.frequency = 'weekly'
+						repeat_on = weekly_recurrence_form.cleaned_data['repeat_on'] 
+						repeat_every = weekly_recurrence_form.cleaned_data['repeat_every']
+						recurrence_obj.byweekday = repeat_on
 				elif repeats == 'daily':
 					pass
 				elif repeats == 'yearly':
@@ -134,20 +150,31 @@ def create_bill(request):
 					# TODO should not get here
 					pass
 
-				has_end = recurrence_form.cleaned_data['has_end']
-				if has_end:
-					end_date = recurrence_form.cleaned_data['end_date']
-					recurrence_obj.until = end_date
+				bill_end_form = BillEndForm(request.POST)
+				if bill_end_form.is_valid():
+					has_end = bill_end_form.cleaned_data['has_end']
+					if has_end:
+						end_date = bill_end_form.cleaned_data['end_date']
+						recurrence_obj.until = end_date
 
+				bill_obj.save()
+				recurrence_obj.bill = bill_obj
 				recurrence_obj.save()
-			else:
-				# TODO return form errors
-				print recurrence_form.errors
+				return redirect('/list/')
 		else:
 			# The bill does not repeat
 			bill_obj.save()
+			return redirect('/list/')
 
-		return redirect('/list/')
+	return render_to_response('bills_form.html', 
+			{'bill_form': bill_form, 
+				'bill_end_form': bill_end_form,
+				'recur_freq_form': recur_freq_form,
+				'daily_recurrence_form': daily_recurrence_form,
+				'weekly_recurrence_form': weekly_recurrence_form,
+				'monthly_recurrence_form': monthly_recurrence_form,
+				'yearly_recurrence_form': yearly_recurrence_form},
+				context_instance=RequestContext(request))
 
 #	if request.method == 'GET'
 #		render_to_response('create_bill')

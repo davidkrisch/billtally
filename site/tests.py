@@ -132,7 +132,10 @@ class CreateBillTest(TestCase):
 		response = self.client.get('/create/')
 		self.assertTemplateUsed(response, 'bills_form.html')
 		self.assertTrue(response.context[0].has_key('bill_form'))
-		self.assertTrue(response.context[0].has_key('recurrence_form'))
+		self.assertTrue(response.context[0].has_key('daily_recurrence_form'))
+		self.assertTrue(response.context[0].has_key('weekly_recurrence_form'))
+		self.assertTrue(response.context[0].has_key('monthly_recurrence_form'))
+		self.assertTrue(response.context[0].has_key('yearly_recurrence_form'))
 
 	def test_create_simple_bill(self):
 		"""Test that create bill adds a single new bill"""
@@ -165,7 +168,7 @@ class CreateBillTest(TestCase):
 		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
 		self.assertEqual(1, len(as_list))
 		date = as_list[0]
-		self.assertEqual(datetime(2010, 11, 1), date)
+		self.assertEqual(datetime(2010, 10, 20), date)
 
 	def test_create_recurring_bill_monthly_by_day_of_week(self):
 		"""Test that creating a recurring bill adds a single new bill - monthly - by day of week
