@@ -23,6 +23,9 @@ urlpatterns = patterns('billtally.site.views',
 
 		# Show the list of bills
 		(r'^list/$', views.list_bills),
+
+		# Self serve account admin page
+		(r'^myaccount/', direct_to_template, {'template': 'myaccount.html'}, 'myaccount'),
 )
 
 urlpatterns += patterns('',

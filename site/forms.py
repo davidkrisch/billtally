@@ -34,16 +34,6 @@ class BaseRecurrenceForm(forms.Form):
 													('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
 	repeat_every = forms.ChoiceField(choices=repeat_every_choices)
 
-class BillEndForm(forms.Form):
-	"""Form for the end of recurrence"""
-	ends_on_choices = (('never', 'Never'), ('until', 'Until'))
-
-	has_end =  forms.ChoiceField(widget=forms.RadioSelect(),
-																choices=ends_on_choices,
-																label='Ends',
-																initial='never')
-	end_date = forms.DateField(required=False)
-
 class DailyRecurrenceForm(BaseRecurrenceForm):
 	"""Form for a bill that occurs daily"""
 	pass

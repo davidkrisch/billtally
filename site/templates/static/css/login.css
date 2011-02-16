@@ -1,0 +1,21 @@
+div#loginform {
+	width: 540px;
+	margin: 0 auto;
+}
+li {
+	clear: both;
+}
+label { 
+	text-align: right;
+	width: 105px;
+	float: left;
+	margin-right: 15px;
+	line-height: 2;
+}
+input {
+	width: 260px;
+	float: left;
+}
+input[type="submit"] {
+	margin-top: 15px;
+}

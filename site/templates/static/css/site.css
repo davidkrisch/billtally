@@ -1,0 +1,148 @@
+body {
+	width: 750px;
+	padding-top: 19px;
+	margin: 0px auto;
+	position: relative;
+	font-size: 108%;
+}
+header {
+	padding-bottom: 10px;
+	border-bottom: 2px solid #666;
+}
+#title {
+	font-size: 197%;
+}
+#title a {
+	text-decoration: none;
+	color: #444;
+}
+#user {
+	float:right;
+	margin-top: 19px;
+}
+#main {
+	margin-top: 40px;
+	width: 75%;
+}
+#billlist {
+	clear: both;
+}
+.bill {
+	width: 100%;
+	padding: 10px 15px;
+	margin: 10px 0;
+	border: 1px solid #ccc; 
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+.bill a {
+	text-decoration: none;
+	font-size: 77%;
+	color: #aaa;
+}
+.date {
+	width: 15%;
+	float: left;
+}
+.name {
+	width: 65%;
+	float: left;
+}
+.amount {
+	width: 20%;
+	float: right;
+	text-align: right;
+}
+.actions {
+	clear: both;
+	padding-top: 10px;
+	text-align: right;
+}
+a.delete {
+	color: #992600;
+}
+a.edit {
+	color: #009926;
+}
+.partial {
+	clear: both;
+	margin-left: 140px;
+	padding-top: 10px;
+	font-size: 85%;
+	color: #999;
+}
+#nav {
+	padding-bottom: 10px;
+	text-align: center;
+}
+#nav #current {
+	font-size: 123.1%;
+	margin: 0 15px 0 15px;
+}
+#nav a {
+	font-size: 77%;
+	text-decoration: none;
+}
+#add {
+	width: 100%;
+}
+#add a {
+	font-size: 85%;
+	text-decoration: none;
+	float: right;
+}
+
+/* Create Bill Form Styles */
+div#billform {
+	margin-left: 150px;
+}
+h1#subtitle {
+	margin: 0px 0px 20px 100px;
+	font-size: 138.5%;
+}
+table {
+	border-spacing: 2px 2px;
+	border-collapse: separate;
+	display: table;
+}
+tbody {
+	display: table-row-group;
+	vertical-align: middle;
+}
+tr {
+	display: table-row;
+	vertical-align: inherit;
+}
+th {
+	padding: 5px 10px 5px 0px;
+	text-align: right;
+}
+td {
+	padding: 0px 0px;
+	vertical-align: inherit;
+}
+td, th {
+	display: table-cell;
+}
+label {
+	font-weight: bold;
+}
+input, select {
+	font-size: 100%;
+	font-family: arial, sans-serif;
+}
+input[type="checkbox"] {
+	vertical-align: middle;
+	margin-left: 6px;
+}
+ul {
+	list-style: none;
+}
+tbody.repeat {
+	display: none;
+}
+div#buttonbox {
+	margin-left: 100px;
+}
+/* End Create Bill Form Styles */

@@ -4,10 +4,10 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import date
 from models import Bill, Recurrence, RRULE_WEEKDAY_MAP, RECURRENCE_FREQ_MAP
-from forms import BillForm, DateRangeForm, RecurFreqForm, BillEndForm
+from forms import BillForm, DateRangeForm, RecurFreqForm
 from forms import DailyRecurrenceForm, WeeklyRecurrenceForm 
 from forms import MonthlyRecurrenceForm, YearlyRecurrenceForm 
-from util import get_date_range
+from util import get_date_range, date_to_datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
 
@@ -65,6 +65,8 @@ def list_bills(request):
 		if not bill_in_list(bill_list, bill):
 			bill_list.append(bill)
 
+	bill_list = sorted(bill_list, key=lambda bill: date_to_datetime(bill.date))
+
 	return render_to_response('list.html', 
 			{'bill_list': bill_list, 'start_date': start, 'end_date': end,
 			 'next_start': next_start, 'next_end': next_end, 
@@ -86,7 +88,7 @@ def create_bill(request):
 	bill_obj = None
 	bill_form = recur_freq_form = daily_recurrence_form = None
 	weekly_recurrence_form = monthly_recurrence_form = None
-	yearly_recurrence_form = bill_end_form = None
+	yearly_recurrence_form = None
 
 	if request.method == 'GET':
 		# Pass a bunch of unbound forms to the create form
@@ -97,7 +99,6 @@ def create_bill(request):
 		weekly_recurrence_form = WeeklyRecurrenceForm()
 		monthly_recurrence_form = MonthlyRecurrenceForm()
 		yearly_recurrence_form = YearlyRecurrenceForm()
-		bill_end_form = BillEndForm()
 	else:
 		bill_form = BillForm(request.POST)
 		if bill_form.is_valid():
@@ -150,13 +151,6 @@ def create_bill(request):
 					# TODO should not get here
 					pass
 
-				bill_end_form = BillEndForm(request.POST)
-				if bill_end_form.is_valid():
-					has_end = bill_end_form.cleaned_data['has_end']
-					if has_end:
-						end_date = bill_end_form.cleaned_data['end_date']
-						recurrence_obj.until = end_date
-
 				bill_obj.save()
 				recurrence_obj.bill = bill_obj
 				recurrence_obj.save()
@@ -168,7 +162,6 @@ def create_bill(request):
 
 	return render_to_response('bills_form.html', 
 			{'bill_form': bill_form, 
-				'bill_end_form': bill_end_form,
 				'recur_freq_form': recur_freq_form,
 				'daily_recurrence_form': daily_recurrence_form,
 				'weekly_recurrence_form': weekly_recurrence_form,

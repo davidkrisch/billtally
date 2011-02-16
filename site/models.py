@@ -16,7 +16,7 @@ class Bill(models.Model):
 	name = models.CharField(max_length=100)
 	amount = models.DecimalField(max_digits=7, decimal_places=2)
 	date = models.DateField()
-	is_paid = models.BooleanField(default=False)
+	is_paid = models.BooleanField(default=False, verbose_name='Is it paid?')
 	parent = models.ForeignKey('self', blank=True, null=True)
 	
 	def __unicode__(self):

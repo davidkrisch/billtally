@@ -19,3 +19,8 @@ def get_date_range(start=None, end=None, obj=None):
 		end = datetime.combine(end, time())
 
 	return (start, end)
+
+
+def date_to_datetime(date):
+	'''Converts a date object to a datetime object with a time of midnight'''
+	return datetime.combine(date, time())

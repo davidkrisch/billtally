@@ -2,90 +2,72 @@
 {% block title %}Create Bill{% endblock %}
 
 {% block content %}
-<h1>Add a new bill:</h1>
-<form action="/create/" method="post">
-	<table>
-		<tbody>
-			<th>{{ bill_form.name.label }}:</th>
-			<td>{{ bill_form.name }}</td>
-		</tbody>	
-		<tbody>
-			<th>{{ bill_form.amount.label }}:</th>
-			<td>{{ bill_form.amount }}</td>
-		</tbody>	
-		<tbody>
-			<th>{{ bill_form.date.label }}:</th>
-			<td>{{ bill_form.date }}</td>
-		</tbody>	
-		<tbody>
-			<th>{{ bill_form.is_paid.label }}:</th>
-			<td>{{ bill_form.is_paid }}</td>
-		</tbody>	
-		<tbody>
-			<th>{{ bill_form.does_repeat.label }}</th>
-			<td>{{ bill_form.does_repeat }}</td>
-		</tbody>	
-		<tbody>
-			<th>{{ bill_form.repeats.label }}</th>
-			<td>{{ bill_form.repeats }}</td>
-		</tbody>	
-	</table>	
-
-	<table>
-		<tbody>
-			<th>{{ recur_freq_form.repeats.label }}:</th>
-			<td>{{ recur_freq_form.repeats }}</td>
-		</tbody>	
-	</table>
-	
-	<table id="repeat_daily">
-		<tbody>
-			<tr>
-				<th>{{ daily_recurrence_form.repeat_every.label }}: </th>
-				<td>{{ daily_recurrence_form.repeat_every }} days</td>
-			</tr>
-			{% include "bills_form_has_end.html" %}
-		</tbody>
-	</table>
-
-	<table id="repeat_weekly">
-		<tbody>
-			<tr>
-				<th>{{ weekly_recurrence_form.repeat_every.label }}: </th>
-				<td>{{ weekly_recurrence_form.repeat_every }} weeks</td>
-			</tr>
-			<tr>
-				<th>{{ weekly_recurrence_form.repeat_on.label }}: </th>
-				<td>{{ weekly_recurrence_form.repeat_on }}</td>
-			</tr>
-			{% include "bills_form_has_end.html" %}
-		</tbody>
-	</table>
-
-	<table id="repeat_monthly">
-		<tbody>
-			<tr>
-				<th>{{ monthly_recurrence_form.repeat_every.label }}: </th>
-				<td>{{ monthly_recurrence_form.repeat_every }} months</td>
-			</tr>
-			<tr>
-				<th>{{ monthly_recurrence_form.repeat_by.label }}: </th>
-				<td>{{ monthly_recurrence_form.repeat_by }}</td>
-			</tr>
-			{% include "bills_form_has_end.html" %}
-		</tbody>
-	</table>
-
-	<table id="repeat_yearly">
-		<tbody>
-			<tr>
-				<th>{{ daily_recurrence_form.repeat_every.label }}: </th>
-				<td>{{ daily_recurrence_form.repeat_every }} years</td>
-			</tr>
-			{% include "bills_form_has_end.html" %}
-		</tbody>
-	</table>
-	<input type="submit" value="Submit"/>
-	<input type="button" value="Cancel"/>
-</form>
+<div id="billform">
+	<h1 id="subtitle">Add a new bill</h1>
+	<form action="/create/" method="post">
+		<table>
+			<tbody>
+				<th>{{ bill_form.name.label_tag }}:</th>
+				<td>{{ bill_form.name }}</td>
+			</tbody>	
+			<tbody>
+				<th>{{ bill_form.amount.label_tag }}:</th>
+				<td>{{ bill_form.amount }}</td>
+			</tbody>	
+			<tbody>
+				<th>{{ bill_form.date.label_tag }}:</th>
+				<td>{{ bill_form.date }}</td>
+			</tbody>	
+			<tbody>
+				<th>&nbsp;</th>
+				<td>
+					<div style="display: inline;">
+						{{ bill_form.is_paid }} {{ bill_form.is_paid.label_tag }}
+						{{ bill_form.does_repeat }} {{ bill_form.does_repeat.label_tag }}
+					</div>
+				</td>
+			</tbody>
+			<tbody class="repeat" id="frequency">
+				<th>{{ recur_freq_form.repeats.label_tag }}:</th>
+				<td>{{ recur_freq_form.repeats }}</td>
+			</tbody>	
+			<tbody class="repeat" id="repeat_daily">
+				<tr>
+					<th>{{ daily_recurrence_form.repeat_every.label_tag }}: </th>
+					<td>{{ daily_recurrence_form.repeat_every }} days</td>
+				</tr>
+			</tbody>
+			<tbody class="repeat" id="repeat_weekly">
+				<tr>
+					<th>{{ weekly_recurrence_form.repeat_every.label_tag }}: </th>
+					<td>{{ weekly_recurrence_form.repeat_every }} weeks</td>
+				</tr>
+				<tr>
+					<th>{{ weekly_recurrence_form.repeat_on.label_tag }}: </th>
+					<td>{{ weekly_recurrence_form.repeat_on }}</td>
+				</tr>
+			</tbody>
+			<tbody class="repeat" id="repeat_monthly">
+				<tr>
+					<th>{{ monthly_recurrence_form.repeat_every.label_tag }}: </th>
+					<td>{{ monthly_recurrence_form.repeat_every }} months</td>
+				</tr>
+				<tr>
+					<th>{{ monthly_recurrence_form.repeat_by.label_tag }}: </th>
+					<td>{{ monthly_recurrence_form.repeat_by }}</td>
+				</tr>
+			</tbody>
+			<tbody class="repeat" id="repeat_yearly">
+				<tr>
+					<th>{{ daily_recurrence_form.repeat_every.label_tag }}: </th>
+					<td>{{ daily_recurrence_form.repeat_every }} years</td>
+				</tr>
+			</tbody>
+		</table>
+		<div id="buttonbox">
+			<input type="submit" value="Submit"/>
+			<input type="button" value="Cancel"/>
+		</div>
+	</form>
+</div>
 {% endblock %}

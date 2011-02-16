@@ -24,114 +24,17 @@
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-
-  <!-- CSS : implied media="all" -->
+	{% block css %}
   <link rel="stylesheet" href="/bt_static/css/style.css?v=2">
+  <link rel="stylesheet" href="/bt_static/css/site.css">
+	{% endblock %}
+  <link rel="stylesheet" href="/bt_static/css/jquery-ui-1.8.9.custom.css">
 
   <!-- Uncomment if you are specifically targeting less enabled mobile browsers
   <link rel="stylesheet" media="handheld" href="css/handheld.css?v=2">  -->
  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="/bt_static/js/libs/modernizr-1.6.min.js"></script>
-
-	<style type="text/css" media="screen">
-		/* <![CDATA[ */
-		body {
-			width: 750px;
-			padding-top: 19px;
-			margin: 0px auto;
-			position: relative;
-			font-size: 108%;
-		}
-		header {
-			padding-bottom: 10px;
-			border-bottom: 2px solid #666;
-		}
-		#title {
-			font-size: 197%;
-		}
-		#title a {
-			text-decoration: none;
-			color: #444;
-		}
-		#user {
-			float:right;
-			margin-top: 19px;
-		}
-		#main {
-			margin-top: 40px;
-			width: 75%;
-		}
-		#billlist {
-			clear: both;
-		}
-		.bill {
-			width: 100%;
-			padding: 10px 15px;
-			margin: 10px 0;
-			border: 1px solid #ccc; 
-			-webkit-border-radius: 10px;
-			-moz-border-radius: 10px;
-			border-radius: 10px;
-		}
-		.bill a {
-			text-decoration: none;
-			font-size: 77%;
-			color: #aaa;
-		}
-		.date {
-			width: 15%;
-			float: left;
-		}
-		.name {
-			width: 65%;
-			float: left;
-		}
-		.amount {
-			width: 20%;
-			float: right;
-			text-align: right;
-		}
-		.actions {
-			clear: both;
-			padding-top: 10px;
-			text-align: right;
-		}
-		a.delete {
-			color: #992600;
-		}
-		a.edit {
-			color: #009926;
-		}
-		.partial {
-			clear: both;
-			margin-left: 140px;
-			padding-top: 10px;
-			font-size: 85%;
-			color: #999;
-		}
-		#nav {
-			padding-bottom: 10px;
-			text-align: center;
-		}
-		#nav #current {
-			font-size: 123.1%;
-			margin: 0 15px 0 15px;
-		}
-		#nav a {
-			font-size: 77%;
-			text-decoration: none;
-		}
-		#add {
-			width: 100%;
-		}
-		#add a {
-			font-size: 85%;
-			text-decoration: none;
-			float: right;
-		}
-		/* ]]> */
-	</style>
 
 </head>
 
@@ -142,7 +45,7 @@
 			<div id="user">
 				{% if user.is_authenticated %}
 					Hi, {{ user.username }}.
-					<a href="#">Account</a>
+					<a href="{% url myaccount %}">Account</a>
 					<a href="{% url django.contrib.auth.views.logout %}">Logout</a>
 				{% else %}
 					<a href="{% url django.contrib.auth.views.login %}">Login</a>
@@ -173,6 +76,10 @@
   <script src="/bt_static/js/plugins.js"></script>
   <script src="/bt_static/js/script.js"></script>
   <!-- end concatenated and minified scripts-->
+
+
+  <script src="/bt_static/js/site.js"></script>
+  <script src="/bt_static/js/jquery-ui-1.8.9.custom.min.js"></script>
   
   
   <!--[if lt IE 7 ]>

@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
 		'registration',
+		'compress',
     'billtally.site',
     'billtally.api',
 )
@@ -85,3 +86,21 @@ INSTALLED_APPS = (
 ACCOUNT_ACTIVATION_DAYS = 5
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL='/list/'
+
+COMPRESS_CSS = {
+		'login_form': {
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css'),
+				'output_filename': 'css/login_compressed.css'
+			},
+		'bill_list': {
+			'source_filenames': (None,),
+			'output_filename': 'css/bill_list.css'
+			},
+		'add_bill': {
+			'source_filenames': (None,),
+			'output_filename': 'css/add_bill.css'
+			}
+}
+
+COMPRESS_JS = {
+}
