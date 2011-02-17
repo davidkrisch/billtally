@@ -1,21 +1,71 @@
-div#loginform {
-	width: 540px;
+#loginform {
+	width: 550px;
 	margin: 0 auto;
+	font-size: 87%;
 }
-li {
+#loginform p {
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 5px;
+}
+#loginform form {
+	padding: 35px 60px;
+	border: 2px solid #666;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+#loginform ul {
+	margin-left: 0;
+}
+#loginform li {
+	list-style: none;
 	clear: both;
+	height: 45px;
 }
-label { 
+#loginform li label {
+	font-weight: bold;
+	width: 95px;
+	float: left;
 	text-align: right;
-	width: 105px;
-	float: left;
 	margin-right: 15px;
-	line-height: 2;
+	line-height: 2.2;
 }
-input {
-	width: 260px;
+#loginform li input[type="text"],
+#loginform li input[type="password"] {
+	width: 100%;
 	float: left;
+	outline: 0 none;
+	border: none;
 }
-input[type="submit"] {
-	margin-top: 15px;
+div.inputwrapper {
+	width: 300px;
+	float: left;
+	padding: 5px;
+	background: white;
+	border: 1px solid #666;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+#loginform li.short {
+	height: 25px;
+}
+#loginform li:last-of-type label:last-of-type {
+	line-height: normal;
+}
+div input[type="submit"] {
+	width: 100px;
+	float: left;
+	margin-left: 50px;
+}
+#loginform a {
+	float: right;
+	text-decoration: none;
+	font-size: 77%;
+	color: #666;
+	margin-right: 5px;
+}
+#loginform a:hover {
+	text-decoration: underline;
 }

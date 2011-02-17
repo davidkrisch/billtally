@@ -1,6 +1,9 @@
 from settings import *
 import os
 
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
 def rel(path):
 	return os.getcwd() + path
 

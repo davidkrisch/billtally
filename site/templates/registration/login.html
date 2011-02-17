@@ -12,14 +12,32 @@
 {% endif %}
 
 <div id="loginform">
+	<p>Enter your email and password to login to your account</p>
 	<form method="post" action="{% url django.contrib.auth.views.login %}">
-	{% csrf_token %}
-	<ul>
-		<li><label for="id_username">Email</label>{{ form.username }}</li>
-		<li>{{ form.password.label_tag }}{{ form.password }}</li>
-	</ul>
-	<input type="submit" value="login" />
-	<input type="hidden" name="next" value="{{ next }}" />
+		{% csrf_token %}
+		<ul>
+			<li>
+				<label for="id_username">Email</label>	
+				<div class="inputwrapper">
+					{{ form.username }}
+				</div>
+			</li>
+			<li>
+				{{ form.password.label_tag }}
+				<div class="inputwrapper">
+					{{ form.password }}
+				</div>
+			</li>
+			<li class="short">
+				<a href="{% url auth_password_reset %}">Forgot Password >></a>
+			</li>
+			<li class="short">
+				<label style="visibility: hidden;">Submit</label>	
+				<input type="submit" value="Login"/>
+			</li>
+		</ul>
+			<input type="hidden" name="next" value="{{ next }}" />
 	</form>
 </div>
+
 {% endblock %}

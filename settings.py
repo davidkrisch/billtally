@@ -1,7 +1,7 @@
-# Django settings for billtally project.
+import os
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+def rel(path):
+	return os.getcwd() + path
 
 ADMINS = (
     ('David Krisch', 'david.krisch@billtally.com'),
@@ -31,7 +31,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -66,9 +66,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'billtally.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+		rel('/site/templates/')
 )
 
 INSTALLED_APPS = (
@@ -97,8 +95,8 @@ COMPRESS_CSS = {
 			'output_filename': 'css/bill_list.css'
 			},
 		'add_bill': {
-			'source_filenames': (None,),
-			'output_filename': 'css/add_bill.css'
+			'source_filenames': ('css/style.css', 'create_bill.css'),
+			'output_filename': 'css/add_edit_bill.css'
 			}
 }
 
