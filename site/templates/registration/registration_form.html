@@ -1,12 +1,46 @@
 {% extends "base.html" %}
+{% load compressed %}
 
-{% block title %}Registration{% endblock %}
+{% block css %}
+{% compressed_css 'registration_form' %}
+{% endblock %}
+
+{% block title %}Register{% endblock %}
 
 {% block content %}
 
-<h1>Registration Form</h1>
-<form action="{% url registration_register %}" method="post">
-{{ form.as_p }}
-<input type="submit" value="Submit" />
-</form>
+{% if form.errors %}
+{{ form.errors }}
+{% endif %}
+
+<div id="loginform">
+	<p>Enter your email and a password to create your BillyTally account</p>
+	<form method="post" action="{% url registration_register %}">
+		{% csrf_token %}
+		<ul>
+			<li>
+				{{ form.email.label_tag }}
+				<div class="inputwrapper">
+					{{ form.email }}
+				</div>
+			</li>	
+			<li>
+				{{ form.password1.label_tag }}
+				<div class="inputwrapper">
+					{{ form.password1 }}
+				</div>
+			</li>
+			<li>
+				{{ form.password2.label_tag }}
+				<div class="inputwrapper">
+					{{ form.password2 }}
+				</div>
+			</li>
+			<li class="short">
+				<label style="visibility: hidden;">Submit</label>	
+				<input type="submit" value="Create Account" />
+			</li>
+		</ul>
+	</form>
+</div>
 {% endblock %}

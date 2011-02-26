@@ -1,11 +1,24 @@
 from django.db import models
 from django.forms import ModelForm, BooleanField
+from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
+from django.contrib import messages
+from registration.signals import user_activated
 from datetime import datetime
 from dateutil.rrule import *
-from django.forms.models import model_to_dict
 from util import get_date_range
 import csv
+
+def activation_complete_callback(sender, **kwargs):
+	'''Signal handler to run when activation in completed.
+	Adds a message to display on the next page.
+	'''
+	import pdb; pdb.set_trace()
+	messages.add_message(kwargs['request'], messages.SUCCESS, 
+			'You have successfully activated your account! Please login to begin managing your bills.')
+
+user_activated.connect(activation_complete_callback)
+
 
 RECURRENCE_FREQ_MAP = {'daily': DAILY, 'weekly': WEEKLY, 'monthly': MONTHLY, 'yearly': YEARLY}
 RRULE_WEEKDAY_MAP = {0: MO, 1: TU, 2: WE, 3: TH, 4: FR, 5: SA, 6: SU}

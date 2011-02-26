@@ -168,19 +168,3 @@ def create_bill(request):
 				'monthly_recurrence_form': monthly_recurrence_form,
 				'yearly_recurrence_form': yearly_recurrence_form},
 				context_instance=RequestContext(request))
-
-#	if request.method == 'GET'
-#		render_to_response('create_bill')
-#	else:
-#		# Save the bill 
-#	request
-#	return render_to_response(TEMPLATES % 'list.xhtml')
-#
-#def read_bill(request, bill_id):
-#	pass
-#
-#def update_bill(request, bill_id):
-#	pass
-#
-#def delete_bill(request, bill_id):
-#	pass

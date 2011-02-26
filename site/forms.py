@@ -66,11 +66,11 @@ class RegistrationFormEmailIsUserName(forms.Form):
 		RegistrationForm subclass that uses email address as the username
 		and enforces uniqueness of the email address in the system.
 	"""
-	email = forms.EmailField(max_length=75, label=_(u'email address'))
+	email = forms.EmailField(max_length=75, label=_(u'Email'))
 	password1 = forms.CharField(widget=forms.PasswordInput(render_value=False),
-								label=_(u'password'))
+								label=_(u'Password'))
 	password2 = forms.CharField(widget=forms.PasswordInput(render_value=False),
-								label=_(u'password (again)'))
+								label=_(u'Password (again)'))
 
 	def clean_email(self):
 		"""Validate that the supplied email address is unique for the site."""
@@ -88,6 +88,8 @@ class RegistrationFormEmailIsUserName(forms.Form):
 		if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
 			if self.cleaned_data['password1'] != self.cleaned_data['password2']:
 				raise forms.ValidationError(_(u'You must type the same password each time'))
+		cd = self.cleaned_data
+		self.cleaned_data = {'username': cd['email'], 'email': cd['email'], 'password1': cd['password1']}
 		return self.cleaned_data
 
 	def save(self, profile_callback=None):

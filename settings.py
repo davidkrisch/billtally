@@ -24,10 +24,19 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.load_template_source',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+		'django.contrib.auth.context_processors.auth',
+		'django.core.context_processors.debug',
+		'django.core.context_processors.i18n',
+		'django.core.context_processors.media',
+		'django.contrib.messages.context_processors.messages',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+		'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 ROOT_URLCONF = 'billtally.urls'
@@ -42,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+		'django.contrib.messages',
 		'registration',
 		'compress',
     'billtally.site',
@@ -49,6 +59,7 @@ INSTALLED_APPS = (
 )
 
 ACCOUNT_ACTIVATION_DAYS = 5
+REGISTRATION_OPEN = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL='/list/'
 
@@ -56,6 +67,10 @@ COMPRESS_CSS = {
 		'login_form': {
 				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css'),
 				'output_filename': 'css/login_compressed.css'
+			},
+		'registration_form': {
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/registration.css'),
+				'output_filename': 'css/registration_compressed.css'
 			},
 		'bill_list': {
 			'source_filenames': (None,),

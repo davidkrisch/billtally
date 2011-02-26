@@ -1,0 +1,10 @@
+#loginform form {
+	padding: 35px 30px;
+}
+#loginform li label {
+	width: 155px;
+}
+div input[type="submit"] {
+	margin-left: 15px;
+	width: 200px;
+}

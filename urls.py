@@ -1,11 +1,11 @@
+from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import *
-from django.views.generic.create_update import create_object
 from django.views.generic.simple import direct_to_template
-from django.contrib.auth import views as auth_views
 from django.conf import settings
+from django.contrib.auth.views import login as auth_login
 from billtally.site import views, models
 from billtally.site.forms import RegistrationFormEmailIsUserName
-from registration.views import register
+from registration.views import register, activate
 
 from django.contrib import admin
 admin.autodiscover()
@@ -13,16 +13,16 @@ admin.autodiscover()
 urlpatterns = patterns('billtally.site.views',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
-    (r'^api/', include('billtally.api.urls')),
+    #(r'^api/', include('billtally.api.urls')),
 
 		# Landing Page
 		(r'^$', direct_to_template, {'template': 'index.html'}),
 
 		#	Show the create new bill form or POST a new bill
-		(r'^create/', views.create_bill),
+		url(r'^create/', views.create_bill, name='create_bill'),
 
 		# Show the list of bills
-		(r'^list/$', views.list_bills),
+		url(r'^list/$', views.list_bills, name='bill_list'),
 
 		# Self serve account admin page
 		(r'^myaccount/', direct_to_template, {'template': 'myaccount.html'}, 'myaccount'),
@@ -30,10 +30,16 @@ urlpatterns = patterns('billtally.site.views',
 
 urlpatterns += patterns('',
 		(r'^accounts/register/$', register,
-				{'form_class': RegistrationFormEmailIsUserName},
+				{'form_class': RegistrationFormEmailIsUserName,
+				 'backend': 'registration.backends.default.DefaultBackend'},
 				'registration_register'),
 
-		(r'^accounts/', include('registration.urls')),
+		(r'^accounts/activate/(?P<activation_key>\w+)/$', activate,
+				{'backend': 'registration.backends.default.DefaultBackend',
+				 'success_url': settings.LOGIN_REDIRECT_URL},
+				'registration_activate'),
+
+		(r'^accounts/', include('registration.backends.default.urls')),
 )
 
 if settings.DEBUG:

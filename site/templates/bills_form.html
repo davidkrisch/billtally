@@ -4,7 +4,7 @@
 {% block content %}
 <div id="billform">
 	<h1 id="subtitle">Add a new bill</h1>
-	<form action="/create/" method="post">
+	<form action="{% url create_bill %}" method="post">
 		<table>
 			<tbody>
 				<th>{{ bill_form.name.label_tag }}:</th>
