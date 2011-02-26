@@ -72,6 +72,10 @@ COMPRESS_CSS = {
 				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/registration.css'),
 				'output_filename': 'css/registration_compressed.css'
 			},
+		'password_reset': {
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset.css'),
+				'output_filename': 'css/password_reset_compressed.css'
+			},
 		'bill_list': {
 			'source_filenames': (None,),
 			'output_filename': 'css/bill_list.css'
