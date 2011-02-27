@@ -37,6 +37,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 		'django.contrib.messages.middleware.MessageMiddleware',
+		'django.middleware.csrf.CsrfViewMiddleware',
 )
 
 ROOT_URLCONF = 'billtally.urls'
@@ -72,9 +73,13 @@ COMPRESS_CSS = {
 				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/registration.css'),
 				'output_filename': 'css/registration_compressed.css'
 			},
-		'password_reset': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset.css'),
-				'output_filename': 'css/password_reset_compressed.css'
+		'password_reset_enteremail': {
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset-enteremail.css'),
+				'output_filename': 'css/password_reset_enteremail_compressed.css'
+			},
+		'password_reset_form': {
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset-form.css'),
+				'output_filename': 'css/password_reset_form_compressed.css'
 			},
 		'bill_list': {
 			'source_filenames': (None,),
