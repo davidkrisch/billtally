@@ -1,7 +1,7 @@
-#loginform form {
+#form-container form {
 	padding: 35px 30px;
 }
-#loginform li label {
+#form-container li label {
 	width: 155px;
 }
 div input[type="submit"] {

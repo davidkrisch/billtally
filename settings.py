@@ -66,19 +66,19 @@ LOGIN_REDIRECT_URL='/list/'
 
 COMPRESS_CSS = {
 		'login_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css'),
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css'),
 				'output_filename': 'css/login_compressed.css'
 			},
 		'registration_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/registration.css'),
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/registration.css'),
 				'output_filename': 'css/registration_compressed.css'
 			},
 		'password_reset_enteremail': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset-enteremail.css'),
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/password-reset-enteremail.css'),
 				'output_filename': 'css/password_reset_enteremail_compressed.css'
 			},
 		'password_reset_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/login.css', 'css/password-reset-form.css'),
+				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/password-reset-form.css'),
 				'output_filename': 'css/password_reset_form_compressed.css'
 			},
 		'bill_list': {
@@ -86,7 +86,7 @@ COMPRESS_CSS = {
 			'output_filename': 'css/bill_list.css'
 			},
 		'add_bill': {
-			'source_filenames': ('css/style.css', 'create_bill.css'),
+			'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/create_bill.css',),
 			'output_filename': 'css/add_edit_bill.css'
 			}
 }

@@ -13,7 +13,7 @@
 {{ form.errors }}
 {% endif %}
 
-<div id="loginform">
+<div id="form-container">
 	<p>Enter your email and a password to create your BillyTally account</p>
 	<form method="post" action="{% url registration_register %}">
 		{% csrf_token %}

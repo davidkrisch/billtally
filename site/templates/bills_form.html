@@ -1,73 +1,87 @@
 {% extends "base.html" %}
+{% load compressed %}
+
 {% block title %}Create Bill{% endblock %}
 
+{% block css %}
+{% compressed_css 'add_bill' %}
+{% endblock %}
+
 {% block content %}
-<div id="billform">
-	<h1 id="subtitle">Add a new bill</h1>
-	<form action="{% url create_bill %}" method="post">
-		<table>
-			<tbody>
-				<th>{{ bill_form.name.label_tag }}:</th>
-				<td>{{ bill_form.name }}</td>
-			</tbody>	
-			<tbody>
-				<th>{{ bill_form.amount.label_tag }}:</th>
-				<td>{{ bill_form.amount }}</td>
-			</tbody>	
-			<tbody>
-				<th>{{ bill_form.date.label_tag }}:</th>
-				<td>{{ bill_form.date }}</td>
-			</tbody>	
-			<tbody>
-				<th>&nbsp;</th>
-				<td>
-					<div style="display: inline;">
-						{{ bill_form.is_paid }} {{ bill_form.is_paid.label_tag }}
-						{{ bill_form.does_repeat }} {{ bill_form.does_repeat.label_tag }}
-					</div>
-				</td>
-			</tbody>
-			<tbody class="repeat" id="frequency">
-				<th>{{ recur_freq_form.repeats.label_tag }}:</th>
-				<td>{{ recur_freq_form.repeats }}</td>
-			</tbody>	
-			<tbody class="repeat" id="repeat_daily">
-				<tr>
-					<th>{{ daily_recurrence_form.repeat_every.label_tag }}: </th>
-					<td>{{ daily_recurrence_form.repeat_every }} days</td>
-				</tr>
-			</tbody>
-			<tbody class="repeat" id="repeat_weekly">
-				<tr>
-					<th>{{ weekly_recurrence_form.repeat_every.label_tag }}: </th>
-					<td>{{ weekly_recurrence_form.repeat_every }} weeks</td>
-				</tr>
-				<tr>
-					<th>{{ weekly_recurrence_form.repeat_on.label_tag }}: </th>
-					<td>{{ weekly_recurrence_form.repeat_on }}</td>
-				</tr>
-			</tbody>
-			<tbody class="repeat" id="repeat_monthly">
-				<tr>
-					<th>{{ monthly_recurrence_form.repeat_every.label_tag }}: </th>
-					<td>{{ monthly_recurrence_form.repeat_every }} months</td>
-				</tr>
-				<tr>
-					<th>{{ monthly_recurrence_form.repeat_by.label_tag }}: </th>
-					<td>{{ monthly_recurrence_form.repeat_by }}</td>
-				</tr>
-			</tbody>
-			<tbody class="repeat" id="repeat_yearly">
-				<tr>
-					<th>{{ daily_recurrence_form.repeat_every.label_tag }}: </th>
-					<td>{{ daily_recurrence_form.repeat_every }} years</td>
-				</tr>
-			</tbody>
-		</table>
-		<div id="buttonbox">
-			<input type="submit" value="Submit"/>
-			<input type="button" value="Cancel"/>
-		</div>
+<div id="form-container">
+	<p>Add a new bill</p>
+	<form action="" method="post">{% csrf_token %}
+		<ul>
+			<li>
+				{{ bill_form.name.label_tag }}
+				<div class="inputwrapper">
+					{{ bill_form.name }}
+				</div>
+			</li>
+			<li>
+				{{ bill_form.amount.label_tag }}
+				<div class="inputwrapper">
+					{{ bill_form.amount }}
+				</div>
+			</li>
+			<li>
+				{{ bill_form.date.label_tag }}
+				<div class="inputwrapper">
+					{{ bill_form.date }}
+				</div>
+			</li>
+			<li>
+				<label class="placeholder">&nbsp;</label>	
+				<div style="display: inline;">
+					{{ bill_form.is_paid }} {{ bill_form.is_paid.label_tag }}
+					{{ bill_form.does_repeat }} {{ bill_form.does_repeat.label_tag }}
+				</div>
+			</li>
+			<li>
+				{{ recur_freq_form.repeats.label_tag }}
+				{{ recur_freq_form.repeats }}
+			</li>
+			<li>
+				{{ daily_recurrence_form.repeat_every.label_tag }}
+				<div class="inputwrapper">
+					{{ daily_recurrence_form.repeat_every }} days
+				</div>
+			</li>
+			<li>
+				{{ weekly_recurrence_form.repeat_every.label_tag }}
+				<div class="inputwrapper">
+					{{ weekly_recurrence_form.repeat_every }} weeks
+				</div>
+			</li>
+			<li>
+				{{ weekly_recurrence_form.repeat_on.label_tag }}
+				<div class="inputwrapper">
+					{{ weekly_recurrence_form.repeat_on }}
+				</div>
+			</li>
+			<li>
+				{{ monthly_recurrence_form.repeat_every.label_tag }}
+				<div class="inputwrapper">
+					{{ monthly_recurrence_form.repeat_every }} months
+				</div>
+			</li>
+			<li>
+				{{ monthly_recurrence_form.repeat_by.label_tag }}
+				<div class="inputwrapper">
+					{{ monthly_recurrence_form.repeat_by }}
+				</div>
+			</li>
+			<li>
+				{{ yearly_recurrence_form.repeat_every.label_tag }}
+				<div class="inputwrapper">
+					{{ yearly_recurrence_form.repeat_every }} years
+				</div>
+			</li>
+			<li class="short">
+				<input type="submit" value="Submit"/>
+				<input type="button" value="Cancel"/>
+			</li>
+		</ul>
 	</form>
 </div>
 {% endblock %}

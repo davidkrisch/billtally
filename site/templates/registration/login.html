@@ -13,13 +13,13 @@
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-<div id="loginform">
+<div id="form-container">
 	<p>Enter your email and password to login to your account</p>
 	<form method="post" action="{% url django.contrib.auth.views.login %}">
 		{% csrf_token %}
 		<ul>
 			<li>
-				<label for="id_email">Email</label>	
+			<label for="id_{{ form.username.html_name }}">Email</label>	
 				<div class="inputwrapper">
 					{{ form.username }}
 				</div>
