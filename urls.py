@@ -19,10 +19,16 @@ urlpatterns = patterns('billtally.site.views',
 		(r'^$', direct_to_template, {'template': 'index.html'}),
 
 		#	Show the create new bill form or POST a new bill
-		url(r'^create/', views.create_bill, name='create_bill'),
+		url(r'^create/', views.create_edit_bill, {'bill_id': None}, name='create_bill'),
+
+		#	Show the edit bill form or POST a new bill
+		url(r'^edit/(?P<bill_id>\d+)/$', views.create_edit_bill, name='edit_bill'),
+
+		#	Show the edit bill form or POST a new bill
+		url(r'^delete/(?P<bill_id>\d+)/$', views.delete_bill, name='delete_bill'),
 
 		# Show the list of bills
-		url(r'^list/$', views.list_bills, name='bill_list'),
+		url(r'^list/$', views.list_bills, name='list_bills'),
 
 		# Self serve account admin page
 		(r'^myaccount/', direct_to_template, {'template': 'myaccount.html'}, 'myaccount'),

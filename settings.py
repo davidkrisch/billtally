@@ -20,10 +20,10 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'nke$&&_o2ex=@h92@a1-*r%rz&fzg4)^41prw_n0rpy)7c64m)'
 
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
+	'django.template.loaders.filesystem.Loader',
+  'django.template.loaders.app_directories.Loader'
 )
-
+ 
 TEMPLATE_CONTEXT_PROCESSORS = (
 		'django.contrib.auth.context_processors.auth',
 		'django.core.context_processors.debug',

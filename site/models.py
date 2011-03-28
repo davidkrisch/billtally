@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm, BooleanField
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
@@ -13,7 +14,6 @@ def activation_complete_callback(sender, **kwargs):
 	'''Signal handler to run when activation in completed.
 	Adds a message to display on the next page.
 	'''
-	import pdb; pdb.set_trace()
 	messages.add_message(kwargs['request'], messages.SUCCESS, 
 			'You have successfully activated your account! Please login to begin managing your bills.')
 
@@ -31,6 +31,12 @@ class Bill(models.Model):
 	date = models.DateField()
 	is_paid = models.BooleanField(default=False, verbose_name='Is it paid?')
 	parent = models.ForeignKey('self', blank=True, null=True)
+	
+	def get_recurrence(self):
+		try:
+			return Recurrence.objects.get(bill=self)
+		except ObjectDoesNotExist:
+			return None
 	
 	def __unicode__(self):
 		return self.name

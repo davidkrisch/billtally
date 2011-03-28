@@ -24,3 +24,18 @@ def get_date_range(start=None, end=None, obj=None):
 def date_to_datetime(date):
 	'''Converts a date object to a datetime object with a time of midnight'''
 	return datetime.combine(date, time())
+
+def bill_model_to_forms(bill_model):
+	'''Converts a bill model to form objects suitable for display'''
+	from forms import BillForm
+	from models import Recurrence
+
+	forms = {}
+	forms['bill_form'] = BillForm(instance=bill_model)	
+	recurrence = bill_model.get_recurrence()
+	if recurrence:
+		if recurrence.frequency == 'monthly':
+			print 'monthly'
+
+	return forms
+

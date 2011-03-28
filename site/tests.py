@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
-from billtally.site.models import Bill, Recurrence
+from models import Bill, Recurrence
+from util import bill_model_to_forms
 from django.contrib.auth.models import User
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -94,6 +95,15 @@ class BillModelTest(TestCase):
 		self.assertEquals(len(r_list), 1)
 		self.assertEquals(r_list[0].date(), datetime(2010, 12, 1).date())
 
+	def test_get_recurrence(self):
+		bill = Bill(**self.bill_data)
+		bill.save()
+		self.assertIsNone(bill.get_recurrence())
+		recurrence = Recurrence(**self.recurrence_data)
+		recurrence.bill = bill
+		recurrence.save()
+		self.assertIsNotNone(bill.get_recurrence())
+
 class ReadBillTest(TestCase):
 	fixtures = ['users.json', 'bills.json']
 
@@ -110,6 +120,50 @@ class ReadBillTest(TestCase):
 		self.failUnlessEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'list.html')
 		self.assertEqual(len(response.context['bill_list']), 4)
+
+class EditBillTest(TestCase):
+	fixtures = ['users.json']
+
+	def setUp(self):
+		'''Set User passwords and log one in'''
+		for user in User.objects.all():
+			user.set_password('password')
+			user.save()
+		self.client.login(username='davidkrisch', password='password')
+		self.simple_bill = {'name': 'Grocery Shopping', 'amount': '64.57',
+				'date': '2010-07-20', 'is_paid': False}
+		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
+				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
+				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
+
+	def test_edit_non_recurring_bill_get(self):
+		Bill(user_id=1, **self.simple_bill).save()
+		response = self.client.get('/edit/1/')
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'bills_form.html')
+		self.assertContains(response, self.simple_bill['name'])
+
+class DeleteBillTest(TestCase):
+	fixtures = ['users.json']
+
+	def setUp(self):
+		'''Set User passwords and log one in'''
+		for user in User.objects.all():
+			user.set_password('password')
+			user.save()
+		self.client.login(username='davidkrisch', password='password')
+		self.simple_bill = {'name': 'Grocery Shopping', 'amount': '64.57',
+				'date': '2010-07-20', 'is_paid': False}
+		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
+				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
+				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
+
+	def test_delete_non_recurring_bill_get(self):
+		'''Delete a non-recurring bill'''
+		Bill(user_id=1, **self.simple_bill).save()
+		response = self.client.get('/delete/1/')
+		self.assertTemplateUsed(response, 'confirm_delete.html')
+		self.assertContains(response, self.simple_bill['name'])
 
 class CreateBillTest(TestCase):
 	fixtures = ['users.json']
@@ -241,3 +295,22 @@ class CreateBillTest(TestCase):
 		self.assertEqual(datetime(2010, 11, 4), as_list[1])
 		self.assertEqual(datetime(2010, 11, 9), as_list[2])
 		self.assertEqual(datetime(2010, 11, 11), as_list[3])
+
+
+class UtilTest(TestCase):
+	'''Testing the util.py module'''
+	fixtures = ['single_user.json']
+
+	def setUp(self):
+		'''Set up some test data'''
+		self.bill_data = {'user': User.objects.get(pk=1), 'name': 'Life Insurance', 'amount': '12.45',
+				'date': '2010-10-01', 'is_paid': True}
+		self.recurrence_data = {'frequency': 'monthly', 'dtstart': '2010-10-01'}
+
+	def test_bill_model_to_forms_no_recurrence(self):
+		'''Test converting a model object to a dictionary of forms'''
+		bill = Bill(**self.bill_data)
+		bill.save()
+		result = bill_model_to_forms(bill)
+		self.assertEquals(len(result.keys()), 1)
+		bill_form = result['bill_form']

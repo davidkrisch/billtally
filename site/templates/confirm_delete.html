@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load compressed %}
+
+{% block css %}
+	{% compressed_css 'add_bill' %}
+{% endblock %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+
+Do you want to delete "{{ bill.name }}"?
+
+<form action="{% url delete_bill bill.id %}" method="POST">{% csrf_token %}
+	<input type="submit" value="Delete">
+</form>
+
+{% endblock %}

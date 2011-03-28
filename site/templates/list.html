@@ -4,12 +4,12 @@
 
 {% block content %}
 	<div id="nav">
-		<a href="{% url billtally.site.views.list_bills %}?start={{ prev_start|date:"Y-m-d" }}&end={{ prev_end|date:"Y-m-d" }}" class="nav">&lt;&lt; previous 30 days</a>
+		<a href="{% url list_bills %}?start={{ prev_start|date:"Y-m-d" }}&end={{ prev_end|date:"Y-m-d" }}" class="nav">&lt;&lt; previous 30 days</a>
 		<span id="current">{{ start_date|date:"M j" }} - {{ end_date|date:"M j" }}</span>
-		<a href="{% url billtally.site.views.list_bills %}?start={{ next_start|date:"Y-m-d" }}&end={{ next_end|date:"Y-m-d" }}" class="nav">next 30 days &gt;&gt;</a>
+		<a href="{% url list_bills %}?start={{ next_start|date:"Y-m-d" }}&end={{ next_end|date:"Y-m-d" }}" class="nav">next 30 days &gt;&gt;</a>
 	</div>
 	<div id="add">
-		<a href="{% url billtally.site.views.create_bill %}">Create new bill</a>
+		<a href="{% url create_bill %}">Create new bill</a>
 	</div>
 
 	{% for bill in bill_list %}
@@ -21,8 +21,8 @@
 				<div class="partial"></div>
 				<div class="actions">
 						<a href="#" class="edit">Pay this Bill</a> •
-						<a href="#">Edit</a> •
-						<a href="#" class="delete">Delete</a>
+						<a href="{% url edit_bill bill.id %}">Edit</a> •
+						<a href="{% url delete_bill bill.id %}" class="delete">Delete</a>
 				</div>
 			</div>
 		</div>

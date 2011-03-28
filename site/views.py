@@ -1,13 +1,14 @@
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import date
 from models import Bill, Recurrence, RRULE_WEEKDAY_MAP, RECURRENCE_FREQ_MAP
 from forms import BillForm, DateRangeForm, RecurFreqForm
 from forms import DailyRecurrenceForm, WeeklyRecurrenceForm 
 from forms import MonthlyRecurrenceForm, YearlyRecurrenceForm 
-from util import get_date_range, date_to_datetime
+from util import get_date_range, date_to_datetime, bill_model_to_forms
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
 
@@ -81,7 +82,25 @@ def bill_in_list(list, bill):
 	return False
 
 @login_required
-def create_bill(request):
+def delete_bill(request, bill_id):
+	'''Delete a bill'''
+	if request.method not in ('POST', 'GET'):
+		return HttpResponseNotAllowed(['GET', 'POST'])
+
+	bill_obj = get_object_or_404(Bill, pk=bill_id)
+
+	if request.method == 'GET':
+		# Show the confirmation page
+		return render_to_response('confirm_delete.html', {'bill': bill_obj},
+				context_instance=RequestContext(request))
+	else:
+		name = bill_obj.name
+		bill_obj.delete()
+		messages.add_message(request, messages.SUCCESS, 'Deleted bill %s' % name)
+		return redirect('/list/')
+
+@login_required
+def create_edit_bill(request, bill_id):
 	if request.method not in ('POST', 'GET'):
 		return HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -90,17 +109,22 @@ def create_bill(request):
 	weekly_recurrence_form = monthly_recurrence_form = None
 	yearly_recurrence_form = None
 
+	if bill_id:
+		bill_obj = get_object_or_404(Bill, pk=bill_id)
+
 	if request.method == 'GET':
 		# Pass a bunch of unbound forms to the create form
-		# TODO if this is an edit, display the real data
-		bill_form = BillForm()
-		recur_freq_form = RecurFreqForm()
-		daily_recurrence_form = DailyRecurrenceForm()
-		weekly_recurrence_form = WeeklyRecurrenceForm()
-		monthly_recurrence_form = MonthlyRecurrenceForm()
-		yearly_recurrence_form = YearlyRecurrenceForm()
+		context = {'bill_form': BillForm(), 
+				'recur_freq_form': RecurFreqForm(),
+				'daily_recurrence_form': DailyRecurrenceForm(),
+				'weekly_recurrence_form': WeeklyRecurrenceForm(),
+				'monthly_recurrence_form': MonthlyRecurrenceForm(),
+				'yearly_recurrence_form': YearlyRecurrenceForm()}
+
+		if bill_obj:
+			context.update(bill_model_to_forms(bill_obj))
 	else:
-		bill_form = BillForm(request.POST)
+		bill_form = BillForm(request.POST, instance=bill_obj)
 		if bill_form.is_valid():
 			bill_obj = bill_form.save(commit=False)
 			bill_obj.user = request.user
@@ -160,11 +184,5 @@ def create_bill(request):
 			bill_obj.save()
 			return redirect('/list/')
 
-	return render_to_response('bills_form.html', 
-			{'bill_form': bill_form, 
-				'recur_freq_form': recur_freq_form,
-				'daily_recurrence_form': daily_recurrence_form,
-				'weekly_recurrence_form': weekly_recurrence_form,
-				'monthly_recurrence_form': monthly_recurrence_form,
-				'yearly_recurrence_form': yearly_recurrence_form},
+	return render_to_response('bills_form.html', context,
 				context_instance=RequestContext(request))
