@@ -12,16 +12,6 @@ from util import get_date_range, date_to_datetime, bill_model_to_forms
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
 
-def api_create_bill(request):
-	"""Create a Bill and the corresponding Recurrance if necessary
-
-	Throws a FormErrorException if there is a validation error
-
-	Parameters:
-		request - HttpRequest
-	"""
-	pass
-
 @login_required
 def list_bills(request):
 	'''Display the users list of bills
@@ -97,7 +87,7 @@ def delete_bill(request, bill_id):
 		name = bill_obj.name
 		bill_obj.delete()
 		messages.add_message(request, messages.SUCCESS, 'Deleted bill %s' % name)
-		return redirect('/list/')
+		return redirect('list_bills')
 
 @login_required
 def create_edit_bill(request, bill_id):
@@ -178,11 +168,11 @@ def create_edit_bill(request, bill_id):
 				bill_obj.save()
 				recurrence_obj.bill = bill_obj
 				recurrence_obj.save()
-				return redirect('/list/')
+				return redirect('list_bills')
 		else:
 			# The bill does not repeat
 			bill_obj.save()
-			return redirect('/list/')
+			return redirect('list_bills')
 
 	return render_to_response('bills_form.html', context,
 				context_instance=RequestContext(request))
