@@ -5,6 +5,11 @@ from models import Bill, Recurrence, RECURRENCE_WEEKDAY_MAP
 from registration.models import RegistrationProfile
 from dateutil.rrule import *
 
+repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6),
+												('7', 7),('8', 8), ('9', 9), ('10', 10), ('11', 11), ('12', 12),
+												('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18),
+												('19', 19),('20', 20), ('21', 21), ('22', 22), ('23', 23), ('24', 24),
+												('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
 
 class DateRangeForm(forms.Form):
 	"""Form for start and end dates"""
@@ -25,24 +30,16 @@ class RecurFreqForm(forms.Form):
 										('monthly', 'Monthly'), ('yearly', 'Yearly'))
 	repeats = forms.ChoiceField(choices=repeat_choices)
 
-class BaseRecurrenceForm(forms.Form):
-	"""Base form for recurring bills"""
-	repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6),
-													('7', 7),('8', 8), ('9', 9), ('10', 10), ('11', 11), ('12', 12),
-													('13', 13),('14', 14), ('15', 15), ('16', 16), ('17', 17), ('18', 18),
-													('19', 19),('20', 20), ('21', 21), ('22', 22), ('23', 23), ('24', 24),
-													('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
-	repeat_every = forms.ChoiceField(choices=repeat_every_choices)
-
-class DailyRecurrenceForm(BaseRecurrenceForm):
+class DailyRecurrenceForm(forms.Form):
 	"""Form for a bill that occurs daily"""
-	pass
+	repeat_every_daily = forms.ChoiceField(label='Repeat Every', choices=repeat_every_choices)
 
-class WeeklyRecurrenceForm(BaseRecurrenceForm):
+class WeeklyRecurrenceForm(forms.Form):
 	"""Form for a bill that occurs weekly"""
 	weekday_choices = ((SU, 'Sunday'), (MO, 'Monday'), (TU, 'Tuesday'), (WE, 'Wednesday'), 
 											(TH, 'Thursday'), (FR, 'Friday'), (SA, 'Saturday'))
 	repeat_on = forms.MultipleChoiceField(choices=weekday_choices, required=False)
+	repeat_every_weekly = forms.ChoiceField(label='Repeat Every', choices=repeat_every_choices)
 
 	def clean_repeat_on(self):
 		"""Turn repeat_on into an array of integers (rrule weekdays objects)"""
@@ -51,15 +48,16 @@ class WeeklyRecurrenceForm(BaseRecurrenceForm):
 		self.cleaned_data['repeat_on'] = days
 		return days 
 
-class MonthlyRecurrenceForm(BaseRecurrenceForm):
+class MonthlyRecurrenceForm(forms.Form):
 	"""Form for a bill that occurs monthly"""
 	repeat_by_choices = (('day_of_month', 'day of the month'), ('day_of_week', 'day of the week'))
 	repeat_by = forms.ChoiceField(widget=forms.RadioSelect(),
 																choices=repeat_by_choices, required=False)
+	repeat_every_monthly = forms.ChoiceField(label='Repeat Every', choices=repeat_every_choices)
 
-class YearlyRecurrenceForm(BaseRecurrenceForm):
+class YearlyRecurrenceForm(forms.Form):
 	"""Form for a bill that occurs yearly"""
-	pass
+	repeat_every_yearly = forms.ChoiceField(label='Repeat Every', choices=repeat_every_choices)
 
 class RegistrationFormEmailIsUserName(forms.Form):
 	"""

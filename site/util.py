@@ -27,15 +27,22 @@ def date_to_datetime(date):
 
 def bill_model_to_forms(bill_model):
 	'''Converts a bill model to form objects suitable for display'''
-	from forms import BillForm
-	from models import Recurrence
+	from forms import BillForm, RecurFreqForm, DailyRecurrenceForm, WeeklyRecurrenceForm, \
+			MonthlyRecurrenceForm, YearlyRecurrenceForm
 
 	forms = {}
 	forms['bill_form'] = BillForm(instance=bill_model)	
 	recurrence = bill_model.get_recurrence()
 	if recurrence:
-		if recurrence.frequency == 'monthly':
-			print 'monthly'
+		forms['recur_freq_form'] = RecurFreqForm({'repeats': recurrence.frequency}),
+		if recurrence.frequency == 'daily':
+			forms['daily_recurrence_form'] = DailyRecurrenceForm()
+		elif recurrence.frequency == 'weekly':
+			forms['weekly_recurrence_form'] = WeeklyRecurrenceForm(repeat_on=recurrence.byweekday)
+		elif recurrence.frequency == 'monthly':
+			forms['monthly_recurrence_form'] = MonthlyRecurrenceForm({'repeat_by': None})
+		elif recurrence.frequency == 'yearly':
+			forms['yearly_recurrence_form'] = YearlyRecurrenceForm()
 
 	return forms
 

@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
+from django.forms.models import model_to_dict
 from django.http import HttpResponseNotAllowed
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -46,17 +47,17 @@ def list_bills(request):
 	for recurrence in recurrences:
 		occurrences = recurrence.as_list(start_date=start, end_date=end)
 		for date in occurrences:
-			to_add = recurrence.bill
-			to_add.date = date
+			to_add = model_to_dict(recurrence.bill)
+			to_add['date'] = date
 			bill_list.append(to_add)
 
 	bills = Bill.objects.filter(user=request.user). \
 									filter(date__gte=start, date__lte=end)
 	for bill in bills:
 		if not bill_in_list(bill_list, bill):
-			bill_list.append(bill)
+			bill_list.append(model_to_dict(bill))
 
-	bill_list = sorted(bill_list, key=lambda bill: date_to_datetime(bill.date))
+	bill_list = sorted(bill_list, key=lambda bill: date_to_datetime(bill['date']))
 
 	return render_to_response('list.html', 
 			{'bill_list': bill_list, 'start_date': start, 'end_date': end,
@@ -67,7 +68,7 @@ def list_bills(request):
 def bill_in_list(list, bill):
 	'''Return True if bill is in list, false otherwise'''
 	for b in list:
-		if b.id == bill.id:
+		if b['id'] == bill.id:
 			return True
 	return False
 
@@ -135,7 +136,7 @@ def create_edit_bill(request, bill_id):
 					if monthly_recurrence_form.is_valid():
 						recurrence_obj.frequency = 'monthly'
 						repeat_by = monthly_recurrence_form.cleaned_data['repeat_by'] 
-						repeat_every = monthly_recurrence_form.cleaned_data['repeat_every']
+						repeat_every = monthly_recurrence_form.cleaned_data['repeat_every_monthly']
 
 						if repeat_by == 'day_of_month':
 							recurrence_obj.repeat_every = repeat_every
@@ -155,8 +156,12 @@ def create_edit_bill(request, bill_id):
 					if weekly_recurrence_form.is_valid():
 						recurrence_obj.frequency = 'weekly'
 						repeat_on = weekly_recurrence_form.cleaned_data['repeat_on'] 
-						repeat_every = weekly_recurrence_form.cleaned_data['repeat_every']
+						repeat_every = weekly_recurrence_form.cleaned_data['repeat_every_weekly']
 						recurrence_obj.byweekday = repeat_on
+						recurrence_obj.interval = repeat_every
+					else:
+						print weekly_recurrence_form.errors
+						# TODO return validation errors
 				elif repeats == 'daily':
 					pass
 				elif repeats == 'yearly':

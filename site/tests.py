@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.test.client import RequestFactory
 from models import Bill, Recurrence
 from util import bill_model_to_forms
 from django.contrib.auth.models import User
@@ -122,29 +123,30 @@ class ReadBillTest(TestCase):
 		self.assertEqual(len(response.context['bill_list']), 4)
 
 class EditBillTest(TestCase):
-	fixtures = ['users.json']
+	fixtures = ['users.json', 'bills.json']
 
 	def setUp(self):
 		'''Set User passwords and log one in'''
+		self.factory = RequestFactory()
 		for user in User.objects.all():
 			user.set_password('password')
 			user.save()
 		self.client.login(username='davidkrisch', password='password')
-		self.simple_bill = {'name': 'Grocery Shopping', 'amount': '64.57',
-				'date': '2010-07-20', 'is_paid': False}
-		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
-				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
-				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
 
 	def test_edit_non_recurring_bill_get(self):
-		Bill(user_id=1, **self.simple_bill).save()
+		response = self.client.get('/edit/3/')
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'bills_form.html')
+		self.assertContains(response, 'SDGE')
+
+	def test_edit_monthly_recurring_bill_get(self):
 		response = self.client.get('/edit/1/')
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'bills_form.html')
-		self.assertContains(response, self.simple_bill['name'])
+		self.assertContains(response, 'Mortgage')
 
 class DeleteBillTest(TestCase):
-	fixtures = ['users.json']
+	fixtures = ['users.json', 'bills.json']
 
 	def setUp(self):
 		'''Set User passwords and log one in'''
@@ -152,18 +154,18 @@ class DeleteBillTest(TestCase):
 			user.set_password('password')
 			user.save()
 		self.client.login(username='davidkrisch', password='password')
-		self.simple_bill = {'name': 'Grocery Shopping', 'amount': '64.57',
-				'date': '2010-07-20', 'is_paid': False}
-		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
-				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
-				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
 
 	def test_delete_non_recurring_bill_get(self):
 		'''Delete a non-recurring bill'''
-		Bill(user_id=1, **self.simple_bill).save()
-		response = self.client.get('/delete/1/')
+		response = self.client.get('/delete/3/')
 		self.assertTemplateUsed(response, 'confirm_delete.html')
-		self.assertContains(response, self.simple_bill['name'])
+		self.assertContains(response, 'SDGE')
+
+	def test_delete_non_recurring_bill_post(self):
+		num_bills_before = Bill.objects.count()
+		response = self.client.post('/delete/3/')
+		num_bills_after = Bill.objects.count()
+		self.assertEquals(num_bills_after, num_bills_before-1)
 
 class CreateBillTest(TestCase):
 	fixtures = ['users.json']
@@ -178,7 +180,7 @@ class CreateBillTest(TestCase):
 				'date': '2010-07-20', 'is_paid': False}
 		self.recurring_bill = {'name': 'Gym Membership', 'amount': '39.90',
 				'date': '2010-07-20', 'is_paid': False, 'does_repeat': 'true', 
-				'repeat_every': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
+				'repeat_every_monthly': 1, 'has_end': 'until', 'end_date': '2011-10-15'}
 
 
 	def test_create_bill_get(self):
@@ -251,6 +253,7 @@ class CreateBillTest(TestCase):
 	def test_create_recurring_bill_weekly(self):
 		"""Test that creating a recurring bill adds a single new bill - weekly"""
 		self.recurring_bill['repeats'] = 'weekly',
+		self.recurring_bill['repeat_every_weekly'] = 1,
 		# Create a bill that occurs weekly on Tuesday
 		self.recurring_bill['repeat_on'] = ['TU']
 		response = self.client.post('/create/', self.recurring_bill, follow=True) 
@@ -274,6 +277,7 @@ class CreateBillTest(TestCase):
 	def test_create_recurring_bill_weekly_twice_a_week(self):
 		"""Test that creating a recurring bill adds a single new bill - weekly"""
 		self.recurring_bill['repeats'] = 'weekly',
+		self.recurring_bill['repeat_every_weekly'] = 1,
 		# Create a bill that occurs weekly on Tuesday, Thursday
 		self.recurring_bill['repeat_on'] = ['TU', 'TH']
 		response = self.client.post('/create/', self.recurring_bill, follow=True) 
@@ -296,6 +300,29 @@ class CreateBillTest(TestCase):
 		self.assertEqual(datetime(2010, 11, 9), as_list[2])
 		self.assertEqual(datetime(2010, 11, 11), as_list[3])
 
+	def test_create_recurring_bill_every_other_friday(self):
+		"""Create a bill that recurrs every other Friday"""
+		# Create a bill that occurs weekly on Friday
+		self.recurring_bill['repeats'] = 'weekly',
+		self.recurring_bill['repeat_on'] = ['FR']
+		self.recurring_bill['repeat_every_weekly'] = 2
+		response = self.client.post('/create/', self.recurring_bill, follow=True) 
+		bills = Bill.objects.all()
+		self.assertEqual(1, len(bills))
+		bill = bills[0]
+		self.assertEqual(self.recurring_bill['name'], bill.name) 
+		self.assertEqual(get_date(self.recurring_bill['date']), bill.date) 
+		self.assertEqual(Decimal(self.recurring_bill['amount']), bill.amount) 
+		self.assertEqual(self.recurring_bill['is_paid'], bill.is_paid) 
+		recurrences = Recurrence.objects.all()
+		self.assertEqual(1, len(recurrences))
+		# Make sure it occurs 2 times between 10/29/2010 and 11/12/2010
+		startdate = datetime(2010, 10, 29)
+		enddate = datetime(2010, 11, 12)
+		as_list = recurrences[0].as_list(start_date=startdate, end_date=enddate)
+		self.assertEqual(2, len(as_list))
+		self.assertEqual(datetime(2010, 10, 29), as_list[0])
+		self.assertEqual(datetime(2010, 11, 12), as_list[1])
 
 class UtilTest(TestCase):
 	'''Testing the util.py module'''
