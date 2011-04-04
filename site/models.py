@@ -72,7 +72,7 @@ class Recurrence(models.Model):
 	byweekno = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True) 
 	byweekday = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True) 
 	byweekdaycount = models.CommaSeparatedIntegerField(max_length=128, null=True, blank=True)
-	bill = models.ForeignKey(Bill, editable=False)
+	bill = models.ForeignKey(Bill, editable=False, unique=True)
 	objects = RecurrenceManager()
 
 	def __unicode__(self):
