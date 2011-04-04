@@ -128,8 +128,13 @@ def create_edit_bill(request, bill_id):
 			if frequency_form.is_valid():
 				repeats = frequency_form.cleaned_data['repeats']
 
-				recurrence_obj = Recurrence()
-				recurrence_obj.dtstart = bill_obj.date
+				recurrence_obj = None
+
+				if bill_id: # This is an edit if bill_obj is not None
+					recurrence_obj = bill_obj.get_recurrence()
+				else:
+					recurrence_obj = Recurrence()
+					recurrence_obj.dtstart = bill_obj.date
 
 				if repeats == 'monthly':
 					monthly_recurrence_form = MonthlyRecurrenceForm(request.POST)
