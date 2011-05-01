@@ -11,6 +11,10 @@ repeat_every_choices = (('1', 1),('2', 2), ('3', 3), ('4', 4), ('5', 5), ('6', 6
 												('19', 19),('20', 20), ('21', 21), ('22', 22), ('23', 23), ('24', 24),
 												('25', 25),('26', 26), ('27', 27), ('28', 28), ('29', 29), ('30', 30))
 
+class DateForm(forms.Form):
+	"""Form for a single date"""
+	date = forms.DateTimeField(required=True)
+
 class DateRangeForm(forms.Form):
 	"""Form for start and end dates"""
 	start = forms.DateTimeField(required=False)

@@ -62,9 +62,11 @@ header {
 a.delete {
 	color: #992600;
 }
-a.edit {
+.bill .edit {
 	color: #009926;
+	font-size: 77%;
 }
+
 .partial {
 	clear: both;
 	margin-left: 140px;

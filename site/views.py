@@ -1,12 +1,14 @@
+from urlparse import urlparse
+from django.core.urlresolvers import resolve
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.forms.models import model_to_dict
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import date
 from models import Bill, Recurrence, RRULE_WEEKDAY_MAP, RECURRENCE_FREQ_MAP
-from forms import BillForm, DateRangeForm, RecurFreqForm
+from forms import BillForm, DateForm, DateRangeForm, RecurFreqForm
 from forms import DailyRecurrenceForm, WeeklyRecurrenceForm 
 from forms import MonthlyRecurrenceForm, YearlyRecurrenceForm 
 from util import get_date_range, date_to_datetime, bill_model_to_forms
@@ -41,9 +43,13 @@ def list_bills(request):
 		pass
 		# TODO return validation error
 
+	bills_in_range = Bill.objects.filter(user=request.user). \
+									filter(date__gte=start, date__lte=end)
+	parent_ids = bills_in_range.exclude(parent__isnull=True).values_list('parent', flat=True)
+
 	bill_list = []
 
-	recurrences = Recurrence.objects.filter(bill__user=request.user)
+	recurrences = Recurrence.objects.filter(bill__user=request.user).exclude(bill__id__in=parent_ids)
 	for recurrence in recurrences:
 		occurrences = recurrence.as_list(start_date=start, end_date=end)
 		for date in occurrences:
@@ -51,8 +57,8 @@ def list_bills(request):
 			to_add['date'] = date
 			bill_list.append(to_add)
 
-	bills = Bill.objects.filter(user=request.user). \
-									filter(date__gte=start, date__lte=end)
+	bills = bills_in_range.exclude(id__in=parent_ids)
+
 	for bill in bills:
 		if not bill_in_list(bill_list, bill):
 			bill_list.append(model_to_dict(bill))
@@ -186,3 +192,35 @@ def create_edit_bill(request, bill_id):
 
 	return render_to_response('bills_form.html', context,
 				context_instance=RequestContext(request))
+
+@login_required
+def mark_bill_paid(request, bill_id):
+	'''Mark a bill as paid'''
+	if request.method not in ('GET'):
+		return HttpResponseNotAllowed(['GET'])
+
+	bill_obj = get_object_or_404(Bill, pk=bill_id)
+	parent_id = bill_obj.id
+
+	date_form = DateForm(request.GET)
+	if date_form.is_valid():
+		# Setting the id to None effectively copies the model
+		bill_obj.id = None
+		bill_obj.date = date_form.cleaned_data['date']
+		bill_obj.is_paid = True
+		bill_obj.parent = get_object_or_404(Bill, pk=parent_id)
+		bill_obj.save()
+	else:
+		# TODO Return a validation error
+		pass
+	
+	next = request.META.get('HTTP_REFERER', None) or '/'
+	response = HttpResponseRedirect(next)
+	view, args, kwargs = resolve(urlparse(next)[2])
+	kwargs['request'] = request
+	try:
+		view(*args, **kwargs)
+	except Http404:
+		return HttpResponseRedirect('/')
+
+	return response

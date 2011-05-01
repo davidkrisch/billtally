@@ -20,8 +20,12 @@
 				<div class="name">{{ bill.name }}</div>
 				<div class="partial"></div>
 				<div class="actions">
-						<a href="#" class="edit">Pay this Bill</a> •
-						<a href="{% url edit_bill bill.id %}">Edit</a> •
+						{% if bill.is_paid %}
+							<span class="edit">Paid</span> 
+						{% else %}
+							<a href="{% url mark_bill_paid bill.id %}?date={{ bill.date|date:"Y-m-d" }}" class="edit">Pay this Bill</a> 
+						{% endif %} <span style="color:#666;">-</span>
+						<a href="{% url edit_bill bill.id %}">Edit</a> -
 						<a href="{% url delete_bill bill.id %}" class="delete">Delete</a>
 				</div>
 			</div>
