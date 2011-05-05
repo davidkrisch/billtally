@@ -17,3 +17,7 @@ div input[type="submit"] {
 div.no-border {
 	border: none;
 }
+
+div input[value="Cancel"] {
+	margin-left: 20px;
+}

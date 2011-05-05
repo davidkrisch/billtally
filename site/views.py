@@ -121,6 +121,10 @@ def create_edit_bill(request, bill_id):
 		if bill_obj:
 			context.update(bill_model_to_forms(bill_obj))
 	else:
+		# If the cancel button was pressed, redirect to the list page
+		if request.POST.get('cancel', None):
+			return HttpResponseRedirect('/list/')
+
 		bill_form = BillForm(request.POST, instance=bill_obj)
 		if bill_form.is_valid():
 			bill_obj = bill_form.save(commit=False)
