@@ -37,46 +37,57 @@
 					{{ bill_form.does_repeat }} {{ bill_form.does_repeat.label_tag }}
 				</div>
 			</li>
+		</ul>
+		<ul id="ul-freq">
 			<li>
 				{{ recur_freq_form.repeats.label_tag }}
 				{{ recur_freq_form.repeats }}
 			</li>
+		</ul>
+		<ul id="ul-daily">
 			<li>
 				{{ daily_recurrence_form.repeat_every_daily.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ daily_recurrence_form.repeat_every_daily }} days
 				</div>
 			</li>
+		</ul>
+		<ul id="ul-weekly">
 			<li>
 				{{ weekly_recurrence_form.repeat_every_weekly.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ weekly_recurrence_form.repeat_every_weekly }} weeks
 				</div>
 			</li>
 			<li>
 				{{ weekly_recurrence_form.repeat_on.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ weekly_recurrence_form.repeat_on }}
 				</div>
 			</li>
+		</ul>
+		<ul id="ul-monthly">
 			<li>
 				{{ monthly_recurrence_form.repeat_every_monthly.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ monthly_recurrence_form.repeat_every_monthly }} months
 				</div>
 			</li>
 			<li>
 				{{ monthly_recurrence_form.repeat_by.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ monthly_recurrence_form.repeat_by }}
 				</div>
 			</li>
+		</ul>
+		<ul id="ul-yearly">
 			<li>
 				{{ yearly_recurrence_form.repeat_every_yearly.label_tag }}
-				<div class="inputwrapper">
+				<div class="inputwrapper no-border">
 					{{ yearly_recurrence_form.repeat_every_yearly }} years
 				</div>
 			</li>
+		</ul>
 			<li class="short">
 				<input type="submit" value="Submit"/>
 				<input type="button" value="Cancel"/>

@@ -13,3 +13,7 @@ input[type="checkbox"] {
 div input[type="submit"] {
 	margin-left: 100px;
 }
+
+div.no-border {
+	border: none;
+}
