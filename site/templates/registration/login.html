@@ -1,45 +1,57 @@
 {% extends "base.html" %}
-{% load compressed %}
-
-{% block css %}
-{% compressed_css 'login_form' %}
-{% endblock %}
 
 {% block title %}Login{% endblock %}
 
+{% block css %}
+  .form-signin {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .form-signin .form-signin-heading,
+  .form-signin .checkbox {
+    margin-bottom: 10px;
+  }
+  .form-signin input[type="text"],
+  .form-signin input[type="password"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+{% endblock %}
+
 {% block content %}
-
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-<div id="form-container">
-	<p>Enter your email and password to login to your account</p>
-	<form method="post" action="{% url django.contrib.auth.views.login %}">
+      <form class="form-signin" method="post" action="">
 		{% csrf_token %}
-		<ul>
-			<li>
-			<label for="id_{{ form.username.html_name }}">Email</label>	
-				<div class="inputwrapper">
-					{{ form.username }}
+		{% for field in form %} 
+			{% if field.errors %}
+				<div class="alert alert-error">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					{{ field.errors|striptags }}
 				</div>
-			</li>
-			<li>
-				{{ form.password.label_tag }}
-				<div class="inputwrapper">
-					{{ form.password }}
-				</div>
-			</li>
-			<li class="short">
-				<a href="{% url auth_password_reset %}">Forgot Password >></a>
-			</li>
-			<li class="short">
-				<label style="visibility: hidden;">Submit</label>	
-				<input type="submit" value="Login"/>
-			</li>
-		</ul>
-			<input type="hidden" name="next" value="{{ next }}" />
-	</form>
-</div>
-
+			{% endif %}
+		{% endfor %}
+		{% for error in form.non_field_errors %} 
+			<div class="alert alert-error">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				{{ error|escape }}
+			</div>
+		{% endfor %}
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input type="text" name="username" class="input-block-level" placeholder="Email address">
+        <input type="password" name="password" class="input-block-level" placeholder="Password">
+        <label class="pull-right">
+		  <a href="{% url auth_password_reset %}">Forget your password?</a>
+        </label>
+        <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+      </form>
 {% endblock %}

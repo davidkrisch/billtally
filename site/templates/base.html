@@ -24,11 +24,21 @@
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+  <link rel="stylesheet" href="/bt_static/css/bootstrap.css">
+  <link rel="stylesheet" href="/bt_static/css/bootstrap-responsive.css">
+  <link rel="stylesheet" href="/bt_static/css/datepicker.css">
+
+  
+  <style type="text/css">
+     body {
+       background-color: #F8F8F8;
+     }
+	 .navbar-static-top {
+		 margin-bottom: 10px;
+	 }
 	{% block css %}
-  <link rel="stylesheet" href="/bt_static/css/style.css?v=2">
-  <link rel="stylesheet" href="/bt_static/css/site.css">
 	{% endblock %}
-  <link rel="stylesheet" href="/bt_static/css/jquery-ui-1.8.9.custom.css">
+  </style>
 
   <!-- Uncomment if you are specifically targeting less enabled mobile browsers
   <link rel="stylesheet" media="handheld" href="css/handheld.css?v=2">  -->
@@ -40,22 +50,44 @@
 
 <body>
 
-  <div id="container">
-    <header>
+  <div class="navbar navbar-static-top">
+	  <div class="navbar-inner">
+		  <div class="container">
+			  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				  <span class="icon-bar"></span>
+				  <span class="icon-bar"></span>
+				  <span class="icon-bar"></span>
+			  </a>
+			  {% if user.is_authenticated %}
+				  <a class="brand" href="{% url billtally.site.views.list_bills %}">BillTally</a>
+			  {% else %}
+				  <a class="brand" href="{% url landing %}">BillTally</a>
+			  {% endif %}
+			  <div class="nav-collapse collapse">
+				  <ul class="nav pull-right">
+					{% if user.is_authenticated %}
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								Signed in as {{ user.username }}<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="{% url myaccount %}">Account</a></li>
+								<li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
+							</ul>
+						</li>
+					{% else %}
+						<li><a href="{% url django.contrib.auth.views.login %}">Login</a></li>
+						<li><a href="{% url registration_register %}">Register</a></li>
+					{% endif %}
+				  </ul>
+			  </div><!--/.nav-collapse -->
+		  </div>
+	  </div>
+  </div>
+  <div class="container">
 			<div id="user">
-				{% if user.is_authenticated %}
-					Hi, {{ user.username }}.
-					<a href="{% url myaccount %}">Account</a>
-					<a href="{% url django.contrib.auth.views.logout %}">Logout</a>
-				{% else %}
-					<a href="{% url django.contrib.auth.views.login %}">Login</a>
-					<a href="{% url registration_register %}">Register</a>
-				{% endif %}
 			</div>
-			<h1 id="title"><a href="{% url billtally.site.views.list_bills %}">BillTally</a></h1>
-    </header>
     
-    <div id="main">
 			{% block messages %}
 				{% if messages %}
 					<ul class="messages">
@@ -67,30 +99,18 @@
 			{% endblock %}
 
 			{% block content %}{% endblock %}
-    </div>
-    
-    <footer>
-
-    </footer>
   </div> <!--! end of #container -->
 
+    <footer>
+		<!-- TODO put some stuff here -->
+    </footer>
 
   <!-- Javascript at the bottom for fast page loading -->
+  <script src="/bt_static/js/jquery.js"></script>
+  <script src="/bt_static/js/bootstrap.js"></script>
+  <script src="/bt_static/js/bootstrap-datepicker.js"></script>
 
-  <!-- Grab Google CDN's jQuery. fall back to local if necessary -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="js/libs/jquery-1.4.2.js"%3E%3C/script%3E'))</script>
-  
-  
-  <!-- scripts concatenated and minified via ant build script-->
-  <script src="/bt_static/js/plugins.js"></script>
-  <script src="/bt_static/js/script.js"></script>
-  <!-- end concatenated and minified scripts-->
-
-
-  <script src="/bt_static/js/site.js"></script>
-  <script src="/bt_static/js/jquery-ui-1.8.9.custom.min.js"></script>
-  
+  {% block js %}{% endblock %}
   
   <!--[if lt IE 7 ]>
     <script src="js/libs/dd_belatedpng.js"></script>

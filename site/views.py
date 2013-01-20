@@ -6,42 +6,41 @@ from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from datetime import date
+from datetime import date, datetime, timedelta
+from calendar import monthrange
 from models import Bill, Recurrence, RRULE_WEEKDAY_MAP, RECURRENCE_FREQ_MAP
 from forms import BillForm, DateForm, DateRangeForm, RecurFreqForm
 from forms import DailyRecurrenceForm, WeeklyRecurrenceForm 
 from forms import MonthlyRecurrenceForm, YearlyRecurrenceForm 
-from util import get_date_range, date_to_datetime, bill_model_to_forms
+from util import date_to_datetime, bill_model_to_forms
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import *
 
 @login_required
-def list_bills(request):
-	'''Display the users list of bills
+def list_bills(request, year=None, month=None):
+	'''Display the user's list of bills
 	
-		Displays bills for the next 30 days by default
-
-		Parameters (optional)
-			start - the first date to display bills for
-			end - the last date to display bills for
+		Displays bills for the given year and month
+		or this month by default
 	'''
 	if request.method not in ['GET']:
 		return HttpResponseNotAllowed(['GET'])	
 
-	start = end = None
+	# Default to this month
+	year = int(year) or date.today.year
+	month = int(month) or date.today.month
 
-	date_range_form = DateRangeForm(request.GET)
-	if date_range_form.is_valid():
-		start_date = date_range_form.cleaned_data['start']
-		end_date = date_range_form.cleaned_data['end']
-		start, end = get_date_range(start=start_date, end=end_date)
+	# Get the number of days in month
+	firstday, lastday = monthrange(year, month)
 
-		# TODO create a unit test for this
-		next_start, next_end = get_date_range(start=end+relativedelta(days=+1)) 
-		prev_start, prev_end = get_date_range(end=start+relativedelta(days=-1)) 
-	else:
-		pass
-		# TODO return validation error
+	# Calculate start and end of month to be displayed
+	start = datetime(year, month, 1)
+	end = datetime(year, month, lastday)
+
+	# Calculate previous and next months
+	one_day = timedelta(days=1)
+	prev_link = start - one_day
+	next_link = end + one_day
 
 	bills_in_range = Bill.objects.filter(user=request.user). \
 									filter(date__gte=start, date__lte=end)
@@ -49,7 +48,8 @@ def list_bills(request):
 
 	bill_list = []
 
-	recurrences = Recurrence.objects.filter(bill__user=request.user).exclude(bill__id__in=parent_ids)
+	recurrences = Recurrence.objects.filter(bill__user=request.user). \
+										exclude(bill__id__in=parent_ids)
 	for recurrence in recurrences:
 		occurrences = recurrence.as_list(start_date=start, end_date=end)
 		for date in occurrences:
@@ -65,10 +65,13 @@ def list_bills(request):
 
 	bill_list = sorted(bill_list, key=lambda bill: date_to_datetime(bill['date']))
 
+	#import pdb; pdb.set_trace()
+
 	return render_to_response('list.html', 
-			{'bill_list': bill_list, 'start_date': start, 'end_date': end,
-			 'next_start': next_start, 'next_end': next_end, 
-			 'prev_start': prev_start, 'prev_end': prev_end},
+			{'bill_list': bill_list, 'current_date': start, 
+			 'next_date': next_link, 'prev_date': prev_link,
+			 'next_month': '%02d' % next_link.month, 'next_year': next_link.year, 
+			 'prev_month': '%02d' % prev_link.month, 'prev_year': prev_link.year},
 			context_instance=RequestContext(request))
 
 def bill_in_list(list, bill):
@@ -123,7 +126,7 @@ def create_edit_bill(request, bill_id):
 	else:
 		# If the cancel button was pressed, redirect to the list page
 		if request.POST.get('cancel', None):
-			return HttpResponseRedirect('/list/')
+			return HttpResponseRedirect(reverse('list_bills'))
 
 		bill_form = BillForm(request.POST, instance=bill_obj)
 		if bill_form.is_valid():
@@ -133,6 +136,7 @@ def create_edit_bill(request, bill_id):
 			# TODO return form errors
 			print bill_form.errors
 
+		import pdb; pdb.set_trace()
 		if 'does_repeat' in bill_form.data:
 			frequency_form = RecurFreqForm(request.POST)			
 			if frequency_form.is_valid():
@@ -142,6 +146,10 @@ def create_edit_bill(request, bill_id):
 
 				if bill_id: # This is an edit if bill_obj is not None
 					recurrence_obj = bill_obj.get_recurrence()
+					if not recurrence_obj:
+						# We're adding a new recurrence to an existing bill
+						recurrence_obj = Recurrence()
+						recurrence_obj.dtstart = bill_obj.date
 				else:
 					recurrence_obj = Recurrence()
 					recurrence_obj.dtstart = bill_obj.date

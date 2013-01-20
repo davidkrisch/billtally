@@ -1,98 +1,110 @@
 {% extends "base.html" %}
-{% load compressed %}
 
 {% block title %}Create Bill{% endblock %}
 
 {% block css %}
-{% compressed_css 'add_bill' %}
+  .form-create-bill {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .form-create-bill .form-create-bill-heading,
+  .form-create-bill .checkbox {
+    margin-bottom: 10px;
+  }
+  .form-create-bill input[type="text"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+  .input-append .add-on, .input-prepend .add-on {
+	font-size: 16px;
+    padding: 7px 3px;
+  }
+{% endblock %}
+
+{% block js %}
+<script>
+		$(function(){
+			$('#date').datepicker();
+		});
+	</script>
 {% endblock %}
 
 {% block content %}
-<div id="form-container">
-	<p>Add a new bill</p>
-	<form action="" method="post">{% csrf_token %}
-		<ul>
-			<li>
-				{{ bill_form.name.label_tag }}
-				<div class="inputwrapper">
-					{{ bill_form.name }}
-				</div>
-			</li>
-			<li>
-				{{ bill_form.amount.label_tag }}
-				<div class="inputwrapper">
-					{{ bill_form.amount }}
-				</div>
-			</li>
-			<li>
-				{{ bill_form.date.label_tag }}
-				<div class="inputwrapper">
-					{{ bill_form.date }}
-				</div>
-			</li>
-			<li>
-				<label class="placeholder">&nbsp;</label>	
-				<div style="display: inline;">
-					{{ bill_form.is_paid }} {{ bill_form.is_paid.label_tag }}
-					{{ bill_form.does_repeat }} {{ bill_form.does_repeat.label_tag }}
-				</div>
-			</li>
-		</ul>
-		<ul id="ul-freq">
-			<li>
-				{{ recur_freq_form.repeats.label_tag }}
-				{{ recur_freq_form.repeats }}
-			</li>
-		</ul>
-		<ul id="ul-daily">
-			<li>
-				{{ daily_recurrence_form.repeat_every_daily.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ daily_recurrence_form.repeat_every_daily }} days
-				</div>
-			</li>
-		</ul>
-		<ul id="ul-weekly">
-			<li>
-				{{ weekly_recurrence_form.repeat_every_weekly.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ weekly_recurrence_form.repeat_every_weekly }} weeks
-				</div>
-			</li>
-			<li>
-				{{ weekly_recurrence_form.repeat_on.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ weekly_recurrence_form.repeat_on }}
-				</div>
-			</li>
-		</ul>
-		<ul id="ul-monthly">
-			<li>
-				{{ monthly_recurrence_form.repeat_every_monthly.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ monthly_recurrence_form.repeat_every_monthly }} months
-				</div>
-			</li>
-			<li>
-				{{ monthly_recurrence_form.repeat_by.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ monthly_recurrence_form.repeat_by }}
-				</div>
-			</li>
-		</ul>
-		<ul id="ul-yearly">
-			<li>
-				{{ yearly_recurrence_form.repeat_every_yearly.label_tag }}
-				<div class="inputwrapper no-border">
-					{{ yearly_recurrence_form.repeat_every_yearly }} years
-				</div>
-			</li>
-		</ul>
-			<li class="short">
-				<input type="submit" value="Submit"/>
-				<input name="cancel" type="submit" value="Cancel"/>
-			</li>
-		</ul>
-	</form>
-</div>
+    <form class="form-create-bill" method="post" action="">
+	  {% csrf_token %}
+	  {% for field in form %} 
+	  	{% if field.errors %}
+	  		<div class="alert alert-error">
+	  			<button type="button" class="close" data-dismiss="alert">&times;</button>
+	  			{{ field.errors|striptags }}
+	  		</div>
+	  	{% endif %}
+	  {% endfor %}
+	  <legend>
+		  {{ bill_form.is_bound }}
+		  {% if bill_form.is_bound %}
+			Edit
+		  {% else %}
+			Add 
+		  {% endif %}
+		  a bill
+	  </legend>
+	  <fieldset>
+		  {{ bill_form.name.label_tag }}
+		  {{ bill_form.name }}
+		  {{ bill_form.amount.label_tag }}
+		  <div class="input-prepend">
+			  <span class="add-on">$</span>
+			  {{ bill_form.amount }}
+		  </div>
+		  {{ bill_form.date.label_tag }}
+		  <div class="input-append date" id="date" data-date="{% now "SHORT_DATE_FORMAT" %}" data-date-format="mm/dd/yyyy">
+			  {{ bill_form.date }}
+			  <span class="add-on"><i class="icon-calendar"></i></span>
+		  </div>
+		  <label class="checkbox">
+			  {{ bill_form.is_paid }} 
+			  {{ bill_form.is_paid.label_tag }}
+		  </label>
+		  <label class="checkbox">
+			  {{ bill_form.does_repeat }} 
+			  {{ bill_form.does_repeat.label_tag }}
+		  </label>
+		  {{ recur_freq_form.repeats }}
+		  {{ daily_recurrence_form.repeat_every_daily.label_tag }}
+		  {{ daily_recurrence_form.repeat_every_daily }} days
+		  {{ weekly_recurrence_form.repeat_every_weekly.label_tag }}
+		  {{ weekly_recurrence_form.repeat_every_weekly }} weeks
+		  {{ weekly_recurrence_form.repeat_on.label_tag }}
+		  {{ weekly_recurrence_form.repeat_on }}
+		  {{ monthly_recurrence_form.repeat_every_monthly.label_tag }}
+		  {{ monthly_recurrence_form.repeat_every_monthly }} months
+
+		  {{ monthly_recurrence_form.repeat_by.label_tag }}
+		  {% for radio in monthly_recurrence_form.repeat_by %}
+		  <label class="radio inline">
+			  {{ radio.tag }} 
+			  {{ radio.choice_label }} 
+		  </label>
+		  {% endfor %}
+
+		  {{ yearly_recurrence_form.repeat_every_yearly.label_tag }}
+		  {{ yearly_recurrence_form.repeat_every_yearly }} years
+		  <div class="form-actions">
+			  <button type="submit" class="btn btn-primary">Save</button>
+			  <button type="submit" name="cancel" class="btn">Cancel</button>
+		  </div>
+		</fieldset>
+    </form>
 {% endblock %}

@@ -32,13 +32,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 		'django.contrib.messages.context_processors.messages',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 		'django.contrib.messages.middleware.MessageMiddleware',
 		'django.middleware.csrf.CsrfViewMiddleware',
-)
+]
 
 ROOT_URLCONF = 'billtally.urls'
 
@@ -46,50 +46,22 @@ TEMPLATE_DIRS = (
 		'%s/site/templates/' % SITE_ROOT
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-		'django.contrib.messages',
-		'registration',
-		'compress',
+    'django.contrib.messages',
+    'django.contrib.humanize',
+    'registration',
+    'crispy_forms',
     'billtally.site',
     'billtally.api',
-)
+]
 
+# django-registration
 ACCOUNT_ACTIVATION_DAYS = 5
 REGISTRATION_OPEN = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL='/list/'
-
-COMPRESS_CSS = {
-		'login_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css'),
-				'output_filename': 'css/login_compressed.css'
-			},
-		'registration_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/registration.css'),
-				'output_filename': 'css/registration_compressed.css'
-			},
-		'password_reset_enteremail': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/password-reset-enteremail.css'),
-				'output_filename': 'css/password_reset_enteremail_compressed.css'
-			},
-		'password_reset_form': {
-				'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/password-reset-form.css'),
-				'output_filename': 'css/password_reset_form_compressed.css'
-			},
-		'bill_list': {
-			'source_filenames': (None,),
-			'output_filename': 'css/bill_list.css'
-			},
-		'add_bill': {
-			'source_filenames': ('css/style.css', 'css/site.css', 'css/forms.css', 'css/create_bill.css',),
-			'output_filename': 'css/add_edit_bill.css'
-			}
-}
-
-COMPRESS_JS = {
-}

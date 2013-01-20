@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<h1>You are now logged out</h1>
+<h2 class="muted">You are now logged out</h2>
+<a href="{% url django.contrib.auth.views.login %}">Login Again</a>
 {% endblock %}

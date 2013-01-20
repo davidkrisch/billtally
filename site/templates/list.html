@@ -1,34 +1,58 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}Your Bills{% endblock %}
 
-{% block content %}
-	<div id="nav">
-		<a href="{% url list_bills %}?start={{ prev_start|date:"Y-m-d" }}&end={{ prev_end|date:"Y-m-d" }}" class="nav">&lt;&lt; previous 30 days</a>
-		<span id="current">{{ start_date|date:"M j" }} - {{ end_date|date:"M j" }}</span>
-		<a href="{% url list_bills %}?start={{ next_start|date:"Y-m-d" }}&end={{ next_end|date:"Y-m-d" }}" class="nav">next 30 days &gt;&gt;</a>
-	</div>
-	<div id="add">
-		<a href="{% url create_bill %}">Create new bill</a>
-	</div>
+{% block css %}
+  .bill-list {
+    max-width: 600px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .pager li > span{
+    border: 0px;  
+  }
+{% endblock %}
 
-	{% for bill in bill_list %}
-		<div id="billlist">
-			<div class="bill">
-				<div class="amount">${{ bill.amount }}</div>
-				<div class="date">{{ bill.date|date:"M j" }}</div>
-				<div class="name">{{ bill.name }}</div>
-				<div class="partial"></div>
-				<div class="actions">
-						{% if bill.is_paid %}
-							<span class="edit">Paid</span> 
-						{% else %}
-							<a href="{% url mark_bill_paid bill.id %}?date={{ bill.date|date:"Y-m-d" }}" class="edit">Pay this Bill</a> 
-						{% endif %} <span style="color:#666;">-</span>
-						<a href="{% url edit_bill bill.id %}">Edit</a> -
-						<a href="{% url delete_bill bill.id %}" class="delete">Delete</a>
-				</div>
-			</div>
-		</div>
-	{% endfor %}
+{% block content %}
+    <div class="container bill-list">
+
+        <ul class="pager">
+            <li class="previous">
+            <a href="{% url list_bills year=prev_year month=prev_month %}" class="nav">&lt;&lt; {{ prev_date|date:"F Y" }}</a>
+            </li>
+            <li><span><strong>{{ current_date|date:"F Y" }}</strong></span></li>
+            <li class="next">
+            <a href="{% url list_bills year=next_year month=next_month %}" class="nav">{{ next_date|date:"F Y" }} &gt;&gt;</a>
+            </li>
+        </ul>
+
+        <a href="{% url create_bill %}"><i class="icon-plus"></i> Create new bill</a>
+        <table class="table table-hover">
+            <tbody>
+                {% for bill in bill_list %}
+                    <tr>
+                        <td>{{ bill.date|date:"M j" }}</td>
+                        <td>
+                            {% if bill.is_paid %}
+                                <span class="label label-success">Paid</span> 
+                            {% else %}
+                                <span class="label">Unpaid</span> 
+                            {% endif %} 
+                        </td>
+                        <td><a href="{% url edit_bill bill.id %}">{{ bill.name }}</a></td>
+                        <td><small>$</small>{{ bill.amount|floatformat:2|intcomma }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

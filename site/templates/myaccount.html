@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Edit My Account{% endblock %}
+
+{% block title %}My Account{% endblock %}
 
 {% block content %}
-<h1>My Account</h1>
-<ul>
+<h2 class="muted">My Account</h2>
+<ul class="unstyled">
 	<li><a href="{% url auth_password_change %}">Change Password</a></li>
 </ul>
 {% endblock %}

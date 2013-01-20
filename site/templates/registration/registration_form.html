@@ -1,46 +1,54 @@
 {% extends "base.html" %}
-{% load compressed %}
-
-{% block css %}
-{% compressed_css 'registration_form' %}
-{% endblock %}
 
 {% block title %}Register{% endblock %}
 
+{% block css %}
+  .form-register {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+       -moz-border-radius: 5px;
+            border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  }
+  .form-register .form-register-heading,
+  .form-register .checkbox {
+    margin-bottom: 10px;
+  }
+  .form-register input[type="text"],
+  .form-register input[type="password"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+  }
+{% endblock %}
+
 {% block content %}
-
-{% if form.errors %}
-{{ form.errors }}
-{% endif %}
-
-<div id="form-container">
-	<p>Enter your email and a password to create your BillyTally account</p>
-	<form method="post" action="{% url registration_register %}">
-		{% csrf_token %}
-		<ul>
-			<li>
-				{{ form.email.label_tag }}
-				<div class="inputwrapper">
-					{{ form.email }}
+	<form class="form-register" method="post" action="">{% csrf_token %}
+		{% for field in form %} 
+			{% if field.errors %}
+				<div class="alert alert-error">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					{{ field.errors|striptags }}
 				</div>
-			</li>	
-			<li>
-				{{ form.password1.label_tag }}
-				<div class="inputwrapper">
-					{{ form.password1 }}
-				</div>
-			</li>
-			<li>
-				{{ form.password2.label_tag }}
-				<div class="inputwrapper">
-					{{ form.password2 }}
-				</div>
-			</li>
-			<li class="short">
-				<label style="visibility: hidden;">Submit</label>	
-				<input type="submit" value="Create Account" />
-			</li>
-		</ul>
+			{% endif %}
+		{% endfor %}
+		{% for error in form.non_field_errors %} 
+			<div class="alert alert-error">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				{{ error|escape }}
+			</div>
+		{% endfor %}
+		<h2 class="form-register-heading">Create an Account</h2>
+		{{ form.email }}
+		{{ form.password1 }}
+		{{ form.password2 }}
+		<button class="btn btn-large btn-primary" type="submit">Create Account</button>
 	</form>
-</div>
 {% endblock %}

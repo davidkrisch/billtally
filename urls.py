@@ -6,6 +6,7 @@ from django.contrib.auth.views import login as auth_login
 from billtally.site import views, models
 from billtally.site.forms import RegistrationFormEmailIsUserName
 from registration.views import register, activate
+from datetime import datetime
 
 from django.contrib import admin
 admin.autodiscover()
@@ -16,7 +17,7 @@ urlpatterns = patterns('billtally.site.views',
     #(r'^api/', include('billtally.api.urls')),
 
 		# Landing Page
-		(r'^$', direct_to_template, {'template': 'index.html'}),
+		(r'^$', direct_to_template, {'template': 'index.html'}, 'landing'),
 
 		#	Show the create new bill form or POST a new bill
 		url(r'^create/', views.create_edit_bill, {'bill_id': None}, name='create_bill'),
@@ -28,7 +29,8 @@ urlpatterns = patterns('billtally.site.views',
 		url(r'^delete/(?P<bill_id>\d+)/$', views.delete_bill, name='delete_bill'),
 
 		# Show the list of bills
-		url(r'^list/$', views.list_bills, name='list_bills'),
+		url(r'^(?P<year>\d{4})/(?P<month>\d{2})/$', views.list_bills, name='list_bills'),
+		url(r'^list/$', views.list_bills, name='current_bills'),
 
 		#	Mark a bill as paid
 		url(r'^paid/(?P<bill_id>\d+)/$', views.mark_bill_paid, name='mark_bill_paid'),
