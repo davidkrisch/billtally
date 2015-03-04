@@ -26,9 +26,9 @@ def list_bills(request, year=None, month=None):
 	if request.method not in ['GET']:
 		return HttpResponseNotAllowed(['GET'])	
 
-	# Default to this month
-	year = int(year) or date.today.year
-	month = int(month) or date.today.month
+	# Default to the current month and year
+	year = int(year) if year else date.today().year
+	month = int(month) if month else date.today().month
 
 	# Get the number of days in month
 	firstday, lastday = monthrange(year, month)
@@ -52,9 +52,9 @@ def list_bills(request, year=None, month=None):
 										exclude(bill__id__in=parent_ids)
 	for recurrence in recurrences:
 		occurrences = recurrence.as_list(start_date=start, end_date=end)
-		for date in occurrences:
+		for d in occurrences:
 			to_add = model_to_dict(recurrence.bill)
-			to_add['date'] = date
+			to_add['date'] = d
 			bill_list.append(to_add)
 
 	bills = bills_in_range.exclude(id__in=parent_ids)
@@ -64,8 +64,6 @@ def list_bills(request, year=None, month=None):
 			bill_list.append(model_to_dict(bill))
 
 	bill_list = sorted(bill_list, key=lambda bill: date_to_datetime(bill['date']))
-
-	#import pdb; pdb.set_trace()
 
 	return render_to_response('list.html', 
 			{'bill_list': bill_list, 'current_date': start, 
@@ -200,7 +198,7 @@ def create_edit_bill(request, bill_id):
 		else:
 			# The bill does not repeat
 			bill_obj.save()
-			return redirect('list_bills')
+			return redirect('current_bills')
 
 	return render_to_response('bills_form.html', context,
 				context_instance=RequestContext(request))
